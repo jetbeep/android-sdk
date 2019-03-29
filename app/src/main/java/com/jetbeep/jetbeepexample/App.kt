@@ -29,7 +29,7 @@ class App : Application() {
             "0179c",
             "jetbeep-test",
             "35117dd1-a7bf-4167-b154-86626f3fac17",
-            JetBeepRegistrationType.ANONYMOUS
+            JetBeepRegistrationType.REGISTERED
         )
 
         JetBeepSDK.barcodeRequestHandler = object : JBBarcodeRequestProtocol {
