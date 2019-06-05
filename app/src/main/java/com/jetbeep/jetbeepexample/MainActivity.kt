@@ -55,6 +55,7 @@ class MainActivity : PermissionsActivity() {
         loadMerchant.setOnClickListener { loadAllMerchants() }
         loadShop.setOnClickListener { loadAllShops() }
         loadOffers.setOnClickListener { loadAllOffers() }
+        startAdvertising.setOnClickListener { startAdvertising() }
 
         // This permissions needs to scanning beacons
         if (!checkPermissions()) {
@@ -77,6 +78,8 @@ class MainActivity : PermissionsActivity() {
 
         JetBeepSDK.beeper.subscribe(beeperCallback)
         JetBeepSDK.locations.subscribe(locationCallbacks)
+
+        startAdvertising()
     }
 
     override fun onPause() {
@@ -104,7 +107,8 @@ class MainActivity : PermissionsActivity() {
             }, {
                 it.printStackTrace()
                 showToast("Failed to load merchants")
-            }))
+            })
+        )
     }
 
     private fun loadAllShops() {
@@ -124,7 +128,8 @@ class MainActivity : PermissionsActivity() {
             }, {
                 it.printStackTrace()
                 showToast("Failed to load shops")
-            }))
+            })
+        )
     }
 
     private fun loadAllOffers() {
@@ -144,7 +149,14 @@ class MainActivity : PermissionsActivity() {
             }, {
                 it.printStackTrace()
                 showToast("Failed to load offers")
-            }))
+            })
+        )
+    }
+
+    private fun startAdvertising() {
+        if (!JetBeepSDK.isBeeping) {
+            JetBeepSDK.startBeep()
+        }
     }
 
     @SuppressLint("SetTextI18n")

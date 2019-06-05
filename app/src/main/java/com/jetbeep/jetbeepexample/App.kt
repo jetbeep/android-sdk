@@ -1,6 +1,8 @@
 package com.jetbeep.jetbeepexample
 
 import android.app.Application
+import android.os.Handler
+import android.os.Looper
 import android.widget.Toast
 import com.jetbeep.*
 import com.jetbeep.beeper.events.BeeperEvent
@@ -26,26 +28,31 @@ class App : Application() {
 
         JetBeepSDK.init(
             this,
-            "0179c",
+            "179c",
             "jetbeep-test",
             "35117dd1-a7bf-4167-b154-86626f3fac17",
             JetBeepRegistrationType.REGISTERED
         )
 
         JetBeepSDK.barcodeRequestHandler = object : JBBarcodeRequestProtocol {
+            val handler = Handler(Looper.getMainLooper())
             override var listener: JBBarcodeTransferProtocol? = object : JBBarcodeTransferProtocol {
                 override fun failureBarcodeTransfer(shop: Shop) {
-                    Toast.makeText(
-                        applicationContext, "failureBarcodeTransfer: ${shop.name}",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    handler.post {
+                        Toast.makeText(
+                            applicationContext, "failureBarcodeTransfer: ${shop.name}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
 
                 override fun succeedBarcodeTransfer(shop: Shop) {
-                    Toast.makeText(
-                        applicationContext, "succeedBarcodeTransfer: ${shop.name}",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    handler.post {
+                        Toast.makeText(
+                            applicationContext, "succeedBarcodeTransfer: ${shop.name}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
 
             }
