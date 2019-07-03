@@ -102,3 +102,34 @@ To receive events such as loyalty card transfers, install a listener:
 ```
 
 See the test application for more details.
+
+## Work with vending devices  
+  
+# Classes & methods of VendingDevices  
+  
+`connect(device: ConnectableDevice): Boolean` - connect to specified device. Returns *true* in case of successful connection.
+
+`disconnect(): Boolean` - disconnect from connected device. Returns *true* in case of successful disconnection. 
+
+`subscribe(customerCallback: DeviceChangeListener)` - subscribe to a listener to get updates of devices and their statuses. 
+
+`unsubscribe(customerCallback: DeviceChangeListener)` - unsubscribe from a listener.
+
+`getVisibleDevices(): List<ConnectableDevice>` - get a list of all visible connectable devices.
+
+**`DeviceChangeListener`** - listener that broadcasting of changing devices. 
+
+**`ConnectableDevice`** - entity of connectable device. Contains:
+ - `shopId` - shop id of the device
+ - `isConnectable(): Boolean` - returns true if device is connectable and if no active connection right now.
+
+#How it works
+
+1. Get an instance of `VendingDevices` from SDK `JetBeepSDK.locations.vendingDevices`
+ 
+3. Create a list for connectable devices - 
+`List<VendingDevices.ConnectableDevice>`
+4. Create callback and subscribe to `DeviceChangeListener`.
+5. In `onChangeDevices` function update a list.
+6. When you get a list of devices, you can use `connect` and `disconnect` methods on devices. When connection is active, all other devices become non-connectable.
+
