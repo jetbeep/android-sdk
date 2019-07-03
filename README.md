@@ -103,14 +103,16 @@ To receive events such as loyalty card transfers, install a listener:
 
 See the test application for more details.
 
-## Work with vending devices  
+## Work with Vending
+
+Base class for vending is VendingDevices. You can access it from `JetBeepSDK.locations.vendingDevices`  
   
-### Classes & methods of VendingDevices  
+### Classes & methods in VendingDevices
   
-`connect(device: ConnectableDevice): Boolean` - connect to specified device. Returns *true* in case of successful connection.
+`connect(device: ConnectableDevice): Boolean` - to connect to specified device. Returns *true* on successful connection.
 
 
-`disconnect(): Boolean` - disconnect from connected device. Returns *true* in case of successful disconnection. 
+`disconnect(): Boolean` - to disconnect from device. Returns *true* on successful disconnection. 
 
 
 `subscribe(customerCallback: DeviceChangeListener)` - subscribe to a listener to get updates of devices and their statuses. 
@@ -122,22 +124,28 @@ See the test application for more details.
 `getVisibleDevices(): List<ConnectableDevice>` - get a list of all visible connectable devices.
 
 
-**`DeviceChangeListener`** - listener that broadcasting of changing devices. 
+**`DeviceChangeListener`** - main listener that notify any updates of devices. 
 
-**`ConnectableDevice`** - entity of connectable device. Contains:
+**`ConnectableDevice`** - entity of connectable device. Contains some public things:
  - `shopId` - shop id of the device
- - `isConnectable(): Boolean` - returns true if device is connectable and if no active connection right now.
- 
+ - `isConnectable(): Boolean` - returns true if device is connectable at the moment.
+
 
 ### How it works
 
-1. Get an instance of `VendingDevices` from SDK `JetBeepSDK.locations.vendingDevices`
+1. Get an instance of `VendingDevices` from SDK 
+```kotlin
+val devices = JetBeepSDK.locations.vendingDevices
+```
 
 2. Create a list for connectable devices - 
-`List<VendingDevices.ConnectableDevice>`
+
+```kotlin
+var list = listOf<VendingDevices.ConnectableDevice>()
+```
 
 3. Create callback and subscribe to `DeviceChangeListener`.
 
-4. In `onChangeDevices` function update a list.
+4. Inside `onChangeDevices()` update a list.
 
-5. When you get a list of devices, you can use `connect` and `disconnect` methods on devices. When connection is active, all other devices become non-connectable.
+5. When you get a list of devices, you can use `connect` and `disconnect` methods on devices. During active connection all other devices become non-connectable.
