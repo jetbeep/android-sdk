@@ -118,7 +118,7 @@ It contains `ConnectableDevice`, entity for devices and `DeviceChangeListener`, 
     devices = vending.getVisibleDevices()
 ````
 
-### Subscribe to DeviceChangeListener
+### Create callback & subscribe to DeviceChangeListener
 
 ```kotlin
     private val callback = object : VendingDevices.DeviceChangeListener {
