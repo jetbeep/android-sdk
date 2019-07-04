@@ -126,7 +126,6 @@ It contains `ConnectableDevice`, entity for devices and `DeviceChangeListener`, 
                 update(devices)
             }
         }
-       
 ```
 ```kotlin
     vending.subscribe(callback)
@@ -139,7 +138,6 @@ Once you've got a list of visible devices, you can connect them
 ```kotlin
     item = devices.get(position)
     vending.connect(item)
-    
 ```
 
 And disconnect from connected device
