@@ -8,7 +8,7 @@ https://drive.google.com/drive/u/1/folders/1exPvE0fJYBYEf-XRj5r4i4IQqMalLuma
 Add this dependency to your project's build file:
 
 ```groovy
-implementation 'com.jetbeep:jetbeepsdk:0.8.14'
+implementation 'com.jetbeep:jetbeepsdk:0.8.18'
 ```
 
 To build debug version of app add snapshot repository to your build.gradle file:
@@ -25,8 +25,8 @@ allprojects {
 Then add release and debug dependencies to your project's build file:
 
 ```groovy
-    releaseImplementation 'com.jetbeep:jetbeepsdk:0.8.14'
-    debugImplementation 'com.jetbeep:jetbeepsdk:0.8.14-SNAPSHOT'
+    releaseImplementation 'com.jetbeep:jetbeepsdk:0.8.18'
+    debugImplementation 'com.jetbeep:jetbeepsdk:0.8.18-SNAPSHOT'
 ```
 
 ### Now you are ready to go!
@@ -102,3 +102,67 @@ To receive events such as loyalty card transfers, install a listener:
 ```
 
 See the test application for more details.
+
+## Work with Vending
+
+You can get instance of VendingDevices here `JetBeepSDK.locations.vendingDevices`
+It contains `ConnectableDevice`, entity for devices and `DeviceChangeListener`, that notifies any updates of devices. 
+
+```kotlin
+    private val vending = JetBeepSDK.locations.vendingDevices
+```
+
+### Get a list of connectable devices
+
+````kotlin
+    devices = vending.getVisibleDevices()
+````
+
+### Create callback & subscribe to DeviceChangeListener
+
+```kotlin
+    private val callback = object : VendingDevices.DeviceChangeListener {
+            override fun onChangeDevices(devices: List<VendingDevices.ConnectableDevice>) {
+                update(devices)
+            }
+        }
+```
+```kotlin
+    vending.subscribe(callback)
+```
+
+### Connect & disconnect
+
+Once you've got a list of visible devices, you can connect them
+
+```kotlin
+    item = devices.get(position)
+    vending.connect(item)
+```
+
+And disconnect from connected device
+
+```kotlin
+    vending.disconnect()
+```
+Note: During active connection all other devices become non-connectable.
+  
+### Classes & methods in VendingDevices
+  
+`connect(device: ConnectableDevice): Boolean` - to connect to specified device. Returns *true* on successful connection.
+
+
+`disconnect(): Boolean` - to disconnect from device. Returns *true* on successful disconnection. 
+
+
+`subscribe(customerCallback: DeviceChangeListener)` - subscribe to a listener to get updates of devices and their statuses. 
+
+
+`unsubscribe(customerCallback: DeviceChangeListener)` - unsubscribe from a listener.
+
+
+`getVisibleDevices(): List<ConnectableDevice>` - get a list of all visible connectable devices.
+
+**`ConnectableDevice`** - entity of connectable device. Contains some public things:
+ - `shopId` - shop id of the device
+ - `isConnectable(): Boolean` - returns true if device is connectable at the moment.
