@@ -138,11 +138,7 @@ Base class for vending is VendingDevices. You can access it from `JetBeepSDK.loc
 val devices = JetBeepSDK.locations.vendingDevices
 ```
 
-2. Create a list for connectable devices - 
-
-```kotlin
-var list = listOf<VendingDevices.ConnectableDevice>()
-```
+2. Create a list for `VendingDevices.ConnectableDevice`
 
 3. Create callback and subscribe to `DeviceChangeListener`.
 
