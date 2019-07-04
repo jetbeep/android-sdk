@@ -105,7 +105,49 @@ See the test application for more details.
 
 ## Work with Vending
 
-Base class for vending is VendingDevices. You can access it from `JetBeepSDK.locations.vendingDevices`  
+You can get instance of VendingDevices here `JetBeepSDK.locations.vendingDevices`
+It contains `ConnectableDevice`, entity for devices and `DeviceChangeListener`, that notifies any updates of devices. 
+
+```kotlin
+    private val vending = JetBeepSDK.locations.vendingDevices
+```
+
+### Get a list of connectable devices
+
+````kotlin
+    devices = vending.getVisibleDevices()
+````
+
+### Subscribe to DeviceChangeListener
+
+```kotlin
+    private val callback = object : VendingDevices.DeviceChangeListener {
+            override fun onChangeDevices(devices: List<VendingDevices.ConnectableDevice>) {
+                update(devices)
+            }
+        }
+       
+```
+```kotlin
+    vending.subscribe(callback)
+```
+
+### Connect & disconnect
+
+Once you've got a list of visible devices, you can connect them
+
+```kotlin
+    item = devices.get(position)
+    vending.connect(item)
+    
+```
+
+And disconnect from connected device
+
+```kotlin
+    vending.disconnect()
+```
+Note: During active connection all other devices become non-connectable.
   
 ### Classes & methods in VendingDevices
   
@@ -123,29 +165,6 @@ Base class for vending is VendingDevices. You can access it from `JetBeepSDK.loc
 
 `getVisibleDevices(): List<ConnectableDevice>` - get a list of all visible connectable devices.
 
-
-**`DeviceChangeListener`** - main listener that notify any updates of devices. 
-
 **`ConnectableDevice`** - entity of connectable device. Contains some public things:
  - `shopId` - shop id of the device
  - `isConnectable(): Boolean` - returns true if device is connectable at the moment.
-
-
-### How it works
-
-1. Get an instance of `VendingDevices` from SDK 
-```kotlin
-val devices = JetBeepSDK.locations.vendingDevices
-```
-
-2. Create a list for connectable devices - 
-
-```kotlin
-var list = listOf<VendingDevices.ConnectableDevice>()
-```
-
-3. Create callback and subscribe to `DeviceChangeListener`.
-
-4. Inside `onChangeDevices()` update a list.
-
-5. When you get a list of devices, you can use `connect` and `disconnect` methods on devices. During active connection all other devices become non-connectable.
