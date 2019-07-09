@@ -5,4 +5,9 @@
     <color name="colorAccent">#D81B60</color>
     <color name="background">#808080</color>
     <color name="text">#FFFF</color>
+    <color name="grey_btn">#EBECF1</color>
+    <color name="colorDimGrey">#6D6F74</color>
+    <color name="error_color">#FF8064</color>
+    <color name="blue_main">#1575ff</color>
+
 </resources>

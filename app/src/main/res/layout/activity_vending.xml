@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools">
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+
+            android:orientation="vertical"
+            android:gravity="top">
+
+        <TextView
+                android:id="@+id/tvVendingStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="50dp"
+                android:layout_marginBottom="30dp"
+                android:gravity="center"
+                tools:text="Device Found"
+                android:textSize="30dp"/>
+
+        <android.support.v7.widget.RecyclerView
+                android:id="@+id/rvDevicesList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+        </android.support.v7.widget.RecyclerView>
+
+    </LinearLayout>
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:orientation="vertical">
+
+        <Button
+                android:id="@+id/btnDisconnect"
+                style="@style/BottomButtonLargeGrey"
+                android:layout_marginTop="25dp"
+                android:text="Disconnect" />
+
+        <Button
+                android:id="@+id/btnUpdate"
+                style="@style/BottomButtonLargeGrey"
+                android:layout_marginTop="25dp"
+                android:text="Update"
+                android:background="@color/error_color"
+                android:textColor="@color/text"/>
+
+    </LinearLayout>
+
+</FrameLayout>

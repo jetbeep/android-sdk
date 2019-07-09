@@ -9,8 +9,8 @@
 
     <Button
             android:id="@+id/loadMerchant"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="155dp"
+            android:layout_height="46dp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             android:layout_marginStart="16dp"
@@ -23,9 +23,16 @@
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="@+id/loadMerchant"
             app:layout_constraintStart_toEndOf="@+id/loadMerchant"
-            android:layout_marginStart="16dp"
+            android:layout_marginStart="8dp"
             android:text="@string/load_shop"/>
 
+    <Button
+            android:id="@+id/loadVending"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="@+id/loadMerchant"
+            android:text="@string/load_vending" app:layout_constraintStart_toEndOf="@+id/loadShop"
+            android:layout_marginStart="8dp" app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="6dp"/>
     <Button
             android:id="@+id/loadOffers"
             android:layout_width="wrap_content"

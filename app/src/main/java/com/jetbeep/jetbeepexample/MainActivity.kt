@@ -2,6 +2,7 @@ package com.jetbeep.jetbeepexample
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
@@ -56,6 +57,7 @@ class MainActivity : PermissionsActivity() {
         loadShop.setOnClickListener { loadAllShops() }
         loadOffers.setOnClickListener { loadAllOffers() }
         startAdvertising.setOnClickListener { startAdvertising() }
+        loadVending.setOnClickListener { startVending() }
 
         // This permissions needs to scanning beacons
         if (!checkPermissions()) {
@@ -157,6 +159,11 @@ class MainActivity : PermissionsActivity() {
         if (!JetBeepSDK.isBeeping) {
             JetBeepSDK.startBeep()
         }
+    }
+
+    private fun startVending() {
+        val intent = Intent(this, VendingActivity::class.java)
+        startActivity(intent)
     }
 
     @SuppressLint("SetTextI18n")

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="bottom_button_height">56dp</dimen>
+
+    <dimen name="textSizeMedium">16dp</dimen>
+</resources>

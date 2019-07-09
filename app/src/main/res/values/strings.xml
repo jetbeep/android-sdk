@@ -3,4 +3,5 @@
     <string name="load_merchant">Load merchants</string>
     <string name="load_shop">Load shops</string>
     <string name="load_offers">Load offers</string>
+    <string name="load_vending">Vending</string>
 </resources>
