@@ -15,18 +15,15 @@ import kotlinx.android.synthetic.main.item_list_connectable_device.view.*
 
 class VendingActivity : Activity() {
 
-    private val devices = JetBeepSDK.locations.vendingDevices
+    private val vending = JetBeepSDK.locations.vendingDevices
 
     private var list = listOf<VendingDevices.ConnectableDevice>()
-
-    private var device: VendingDevices.ConnectableDevice? = null
 
     lateinit var adapter: DevicesAdapter
 
     private val callback = object : VendingDevices.DeviceChangeListener {
         override fun onChangeDevices(devices: List<VendingDevices.ConnectableDevice>) {
-            //list = devices
-            update()
+            updateResult()
         }
     }
 
@@ -41,57 +38,52 @@ class VendingActivity : Activity() {
         rvDevicesList.layoutManager = linearLayoutManager
         rvDevicesList.adapter = adapter
 
-        devices.subscribe(callback)
-
-        update()
-
-        updateResult()
-
         btnUpdate?.setOnClickListener {
-            update()
             updateResult()
         }
 
         btnDisconnect?.setOnClickListener {
-            devices.disconnect()
+            vending.disconnect()
         }
     }
 
-    private fun update() {
-        list = devices.getVisibleDevices()
-    }
 
     private fun updateResult() {
+        list = vending.getVisibleDevices()
+
         if (list.isEmpty()) {
             tvVendingStatus?.text = "Devices not found"
         } else {
 
             tvVendingStatus?.text = "Found ${list.size} device(s)"
 
-            adapter.update(devices.getVisibleDevices()
-                    as MutableList<VendingDevices.ConnectableDevice>, object : DevicesClickListener {
+            adapter.update(list as MutableList<VendingDevices.ConnectableDevice>, object : DevicesClickListener {
                 override fun onConnectButtonClicked(position: Int) {
 
-                    device = devices.getVisibleDevices().get(position)
+                    val item = list[position]
 
-                    device?.let {
-
-                        if (it.isConnectable()) {
-                            devices.connect(it)
-                            tvVendingStatus?.text = "ShopID: ${it.shopId}" // change to recycler item update
-                        } else {
-                            tvVendingStatus?.text = "Device isn't connectable" // change to recycler item update
-                        }
+                    if (item.isConnectable()) {
+                        vending.connect(item)
+                        tvVendingStatus?.text = "ShopID: ${item.shopId}" // change to recycler item update
+                    } else {
+                        tvVendingStatus?.text = "Device isn't connectable" // change to recycler item update
                     }
+
                 }
             })
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        vending.subscribe(callback)
+    }
+
     override fun onPause() {
         super.onPause()
 
-        devices.unsubscribe(callback)
+        vending.unsubscribe(callback)
     }
 
     class DevicesAdapter(private var context: Context) : RecyclerView.Adapter<DeviceViewHolder>() {

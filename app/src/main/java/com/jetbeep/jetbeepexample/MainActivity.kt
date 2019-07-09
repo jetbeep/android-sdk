@@ -28,13 +28,15 @@ class MainActivity : PermissionsActivity() {
     private val compositeDisposable = CompositeDisposable()
     private val format = SimpleDateFormat("HH:mm:ss: ", Locale.getDefault())
 
+    private var locationListener: LocationCallbacks? = null
+
     private val beeperCallback: BeeperCallback = object : BeeperCallback() {
         override fun onEvent(beeperEvent: BeeperEvent) {
             printToConsole(beeperEvent.javaClass.simpleName)
         }
     }
 
-    private val locationCallbacks = object : LocationCallbacks {
+    /*private val locationCallbacks = object : LocationCallbacks {
         override fun onObtainActualShops(shops: List<Shop>) {
         }
 
@@ -44,7 +46,7 @@ class MainActivity : PermissionsActivity() {
         override fun onShopEntered(shop: Shop, merchant: Merchant) {
             printToConsole("Entered shop: ${shop.name}")
         }
-    }
+    }*/
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,11 +77,35 @@ class MainActivity : PermissionsActivity() {
         }
     }
 
+    private fun getLocationListener(): LocationCallbacks {
+        if (locationListener == null) {
+            locationListener = object : LocationCallbacks {
+                override fun onMerchantEntered(merchant: Merchant) {
+                    printToConsole("Entered merchant: ${merchant.name}")
+                }
+
+                override fun onMerchantExit(merchant: Merchant) {
+                    printToConsole("Exit merchant: ${merchant.name}")
+                }
+
+                override fun onShopEntered(shop: Shop) {
+                    printToConsole("Entered shop: ${shop.name}")
+                }
+
+                override fun onShopExit(shop: Shop) {
+                    printToConsole("Exit from shop: ${shop.name}")
+                }
+            }
+        }
+
+        return locationListener!!
+    }
+
     override fun onResume() {
         super.onResume()
 
         JetBeepSDK.beeper.subscribe(beeperCallback)
-        JetBeepSDK.locations.subscribe(locationCallbacks)
+        JetBeepSDK.locations.subscribe(getLocationListener())
 
         startAdvertising()
     }
@@ -89,7 +115,7 @@ class MainActivity : PermissionsActivity() {
         compositeDisposable.clear()
 
         JetBeepSDK.beeper.unsubscribe(beeperCallback)
-        JetBeepSDK.locations.unsubscribe(locationCallbacks)
+        JetBeepSDK.locations.unsubscribe(getLocationListener())
     }
 
     private fun loadAllMerchants() {
