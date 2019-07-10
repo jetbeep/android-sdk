@@ -146,6 +146,46 @@ And disconnect from connected device
     vending.disconnect()
 ```
 Note: During active connection all other devices become non-connectable.
+
+### Receiving events from devices
+
+You need to receive events for interact with device after connection.
+In order to open a session and initiate payment, we need to receive events from the device.
+To do this, we need to create an instance for *BeeperCallback()* and subscribe to events:
+
+```kotlin
+private val beeperCallback = object : BeeperCallback() {
+        override fun onEvent(beeperEvent: BeeperEvent) {
+            when (beeperEvent) {
+                is Advertising -> { }
+                is SessionOpened -> { }
+                is SessionClosed -> { }
+                is LoyaltyTransferred -> { }
+                is NoLoyaltyCard -> { }
+                is PaymentInitiated -> { }
+                is PaymentInProgress -> { }
+                is PaymentError -> { }
+                is PaymentSuccessful -> { }
+                is BluetoothFeatureNotSupported -> { }
+            }
+        }
+    }
+```
+    
+In example above all possible events are listed, but you can use only those that are necessary for vending.
+
+Then you need to subscribe to get events: 
+```kotlin
+JetBeepSDK.beeper.subscribe(beeperCallback)
+```
+When closing, don't forget to unsubscribe: 
+```kotlin
+JetBeepSDK.beeper.unsubscribe(beeperCallback)
+```
+
+### Testing
+
+IMPORTANT NOTE: Before testing ensure that your devices is configured for VENDING-type merchants. Please double-check them.
   
 ### Classes & methods in VendingDevices
   
