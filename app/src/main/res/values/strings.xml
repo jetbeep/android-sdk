@@ -4,4 +4,6 @@
     <string name="load_shop">Load shops</string>
     <string name="load_offers">Load offers</string>
     <string name="load_vending">Vending</string>
+    <string name="update">update</string>
+    <string name="disconnect">disconnect</string>
 </resources>

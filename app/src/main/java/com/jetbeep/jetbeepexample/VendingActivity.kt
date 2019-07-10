@@ -1,5 +1,6 @@
 package com.jetbeep.jetbeepexample
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.os.Bundle
@@ -10,27 +11,35 @@ import android.view.View
 import android.view.ViewGroup
 import com.jetbeep.JetBeepSDK
 import com.jetbeep.locations.VendingDevices
-import kotlinx.android.synthetic.main.activity_vending.*
+import com.jetbeep.model.entities.Shop
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.activity_main.console
+import kotlinx.android.synthetic.main.activity_vending_new.*
 import kotlinx.android.synthetic.main.item_list_connectable_device.view.*
+import java.text.SimpleDateFormat
+import java.util.*
 
 class VendingActivity : Activity() {
 
     private val vending = JetBeepSDK.locations.vendingDevices
 
+    private val format = SimpleDateFormat("HH:mm:ss: ", Locale.getDefault())
     private var list = listOf<VendingDevices.ConnectableDevice>()
 
     lateinit var adapter: DevicesAdapter
 
     private val callback = object : VendingDevices.DeviceChangeListener {
         override fun onChangeDevices(devices: List<VendingDevices.ConnectableDevice>) {
-            updateResult()
+            update()
+            printToConsole("Devices changed. Found ${devices.size} devices")
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setContentView(R.layout.activity_vending)
+        setContentView(R.layout.activity_vending_new)
 
         adapter = DevicesAdapter(this)
 
@@ -38,24 +47,36 @@ class VendingActivity : Activity() {
         rvDevicesList.layoutManager = linearLayoutManager
         rvDevicesList.adapter = adapter
 
+        update()
+
         btnUpdate?.setOnClickListener {
-            updateResult()
+            update()
+            printToConsole("Update pressed")
         }
 
         btnDisconnect?.setOnClickListener {
             vending.disconnect()
+            printToConsole("Disconnected!")
+        }
+
+        printToConsole("Welcome to Vending test!")
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun printToConsole(text: String) {
+        if (!isFinishing) {
+            val oldText = console.text.toString()
+            console.text = format.format(Date()) + text + "\n" + oldText
         }
     }
 
-
-    private fun updateResult() {
+    private fun update() {
         list = vending.getVisibleDevices()
 
         if (list.isEmpty()) {
-            tvVendingStatus?.text = "Devices not found"
+            printToConsole("Devices not found")
         } else {
-
-            tvVendingStatus?.text = "Found ${list.size} device(s)"
+            printToConsole("Found ${list.size} device(s)")
 
             adapter.update(list as MutableList<VendingDevices.ConnectableDevice>, object : DevicesClickListener {
                 override fun onConnectButtonClicked(position: Int) {
@@ -64,11 +85,10 @@ class VendingActivity : Activity() {
 
                     if (item.isConnectable()) {
                         vending.connect(item)
-                        tvVendingStatus?.text = "ShopID: ${item.shopId}" // change to recycler item update
+                        printToConsole("Connected! ShopId: ${item.shopId}")
                     } else {
-                        tvVendingStatus?.text = "Device isn't connectable" // change to recycler item update
+                        printToConsole("Device isn't connectable")
                     }
-
                 }
             })
         }
@@ -108,8 +128,9 @@ class VendingActivity : Activity() {
             val item = devices.get(position)
 
             holder.itemView.apply {
-                //tvDeviceName?.text = item.address
-                tvShopId?.text = item.shopId.toString()
+                tvDeviceName?.text = "Device #${position + 1}"
+                tvShopId?.text = "ShopID: ${item.shopId}"
+
                 this.btnConnectToDevice?.setOnClickListener {
                     listener?.onConnectButtonClicked(position)
                 }
