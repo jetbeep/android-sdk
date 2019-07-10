@@ -4,22 +4,21 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.os.Bundle
+import android.os.Handler
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.jetbeep.JetBeepSDK
+import com.jetbeep.beeper.events.*
+import com.jetbeep.beeper.events.helpers.BeeperCallback
 import com.jetbeep.locations.VendingDevices
-import com.jetbeep.model.entities.Shop
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.console
 import kotlinx.android.synthetic.main.activity_vending_new.*
 import kotlinx.android.synthetic.main.item_list_connectable_device.view.*
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
 
 class VendingActivity : Activity() {
 
@@ -34,6 +33,38 @@ class VendingActivity : Activity() {
         override fun onChangeDevices(devices: List<VendingDevices.ConnectableDevice>) {
             update()
             printToConsole("Devices changed. Found ${devices.size} devices")
+        }
+    }
+
+    private val beeperCallback = object : BeeperCallback() {
+        override fun onEvent(beeperEvent: BeeperEvent) {
+            when (beeperEvent) {
+                is Advertising -> {
+                    printToConsole("Beeper -> is Advertising")
+                }
+                is SessionOpened -> {
+                    printToConsole("Beeper -> is SessionOpened")
+                }
+                is SessionClosed -> {
+                    printToConsole("Beeper -> is SessionClosed")
+                }
+
+                is PaymentInitiated -> {
+                    printToConsole("Beeper -> is PaymentInitiated")
+                }
+                is PaymentInProgress -> {
+                    printToConsole("Beeper -> is PaymentInProgress")
+                }
+                is PaymentError -> {
+                    printToConsole("Beeper -> is PaymentError")
+                }
+                is PaymentSuccessful -> {
+                    printToConsole("Beeper -> is PaymentSuccessful")
+                }
+                is BluetoothFeatureNotSupported -> {
+                    printToConsole("Beeper -> is BluetoothFeatureNotSupported")
+                }
+            }
         }
     }
 
@@ -75,7 +106,7 @@ class VendingActivity : Activity() {
 
         list = vending.getVisibleDevices()
 
-        if(vending.getVisibleDevices().isNotEmpty()) {
+        if (vending.getVisibleDevices().isNotEmpty()) {
             printToConsole("Found ${list.size} device(s)")
         } else {
             printToConsole("Devices not found")
@@ -100,12 +131,26 @@ class VendingActivity : Activity() {
         super.onResume()
 
         vending.subscribe(callback)
+        JetBeepSDK.beeper.subscribe(beeperCallback)
+
+        val restartBeeper = (JetBeepSDK.beeper.lastEvent is NotAdvertising && !JetBeepSDK.isBeeping)
+                || JetBeepSDK.beeper.lastEvent is SessionClosed
+        if (restartBeeper)
+            JetBeepSDK.startBeep()
+        else
+            beeperCallback.onEvent(JetBeepSDK.beeper.lastEvent)
     }
 
     override fun onPause() {
         super.onPause()
 
         vending.unsubscribe(callback)
+        JetBeepSDK.beeper.unsubscribe(beeperCallback)
+
+        Handler().post {
+            if (JetBeepSDK.beeper.isStarted && !JetBeepSDK.beeper.isSessionOpened)
+                JetBeepSDK.stopBeep()
+        }
     }
 
     class DevicesAdapter(private var context: Context) : RecyclerView.Adapter<DeviceViewHolder>() {
