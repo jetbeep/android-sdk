@@ -6,4 +6,5 @@
     <string name="load_vending">Vending</string>
     <string name="update">update</string>
     <string name="disconnect">disconnect</string>
+    <string name="connect">connect</string>
 </resources>

@@ -19,6 +19,7 @@ import kotlinx.android.synthetic.main.activity_vending_new.*
 import kotlinx.android.synthetic.main.item_list_connectable_device.view.*
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 class VendingActivity : Activity() {
 
@@ -71,27 +72,28 @@ class VendingActivity : Activity() {
     }
 
     private fun update() {
+
         list = vending.getVisibleDevices()
 
-        if (list.isEmpty()) {
-            printToConsole("Devices not found")
-        } else {
+        if(vending.getVisibleDevices().isNotEmpty()) {
             printToConsole("Found ${list.size} device(s)")
-
-            adapter.update(list as MutableList<VendingDevices.ConnectableDevice>, object : DevicesClickListener {
-                override fun onConnectButtonClicked(position: Int) {
-
-                    val item = list[position]
-
-                    if (item.isConnectable()) {
-                        vending.connect(item)
-                        printToConsole("Connected! ShopId: ${item.shopId}")
-                    } else {
-                        printToConsole("Device isn't connectable")
-                    }
-                }
-            })
+        } else {
+            printToConsole("Devices not found")
         }
+
+        adapter.update(list, object : DevicesClickListener {
+            override fun onConnectButtonClicked(position: Int) {
+
+                val item = list[position]
+
+                if (item.isConnectable()) {
+                    vending.connect(item)
+                    printToConsole("Connected! ShopId: ${item.shopId}")
+                } else {
+                    printToConsole("Device isn't connectable")
+                }
+            }
+        })
     }
 
     override fun onResume() {
@@ -108,7 +110,7 @@ class VendingActivity : Activity() {
 
     class DevicesAdapter(private var context: Context) : RecyclerView.Adapter<DeviceViewHolder>() {
 
-        private var devices = mutableListOf<VendingDevices.ConnectableDevice>()
+        private var devices = listOf<VendingDevices.ConnectableDevice>()
         private var listener: DevicesClickListener? = null
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DeviceViewHolder {
@@ -137,7 +139,7 @@ class VendingActivity : Activity() {
             }
         }
 
-        fun update(devices: MutableList<VendingDevices.ConnectableDevice>, listener: DevicesClickListener) {
+        fun update(devices: List<VendingDevices.ConnectableDevice>, listener: DevicesClickListener) {
 
             this.listener = listener
             this.devices = devices
