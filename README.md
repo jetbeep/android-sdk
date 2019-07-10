@@ -174,13 +174,15 @@ private val beeperCallback = object : BeeperCallback() {
     
 In example above all possible events are listed, but you can use only those that are necessary for vending.
 
-Then you need to subscribe to get events: 
+Then you need to subscribe to get events and start the beeper: 
 ```kotlin
 JetBeepSDK.beeper.subscribe(beeperCallback)
+JetBeepSDK.startBeep()
 ```
-When closing, don't forget to unsubscribe: 
+When closing, don't forget to unsubscribe and stop the beeper: 
 ```kotlin
 JetBeepSDK.beeper.unsubscribe(beeperCallback)
+JetBeepSDK.stopBeep()
 ```
 
 ### Testing
