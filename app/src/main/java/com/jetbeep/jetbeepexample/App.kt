@@ -3,32 +3,32 @@ package com.jetbeep.jetbeepexample
 import android.app.Application
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.widget.Toast
 import com.jetbeep.*
 import com.jetbeep.beeper.events.BeeperEvent
 import com.jetbeep.beeper.events.LoyaltyTransferred
 import com.jetbeep.beeper.events.NoLoyaltyCard
+import com.jetbeep.beeper.events.PaymentInitiated
 import com.jetbeep.beeper.events.helpers.BeeperCallback
 import com.jetbeep.locations.LocationCallbacks
 import com.jetbeep.model.entities.Merchant
 import com.jetbeep.model.entities.Shop
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 
 class App : Application() {
 
     private lateinit var locationCallbacks: LocationCallbacks
 
-    private val beeperCallback: BeeperCallback = object : BeeperCallback() {
-        override fun onEvent(beeperEvent: BeeperEvent) {
-            showNotification(beeperEvent)
-        }
-    }
+    private lateinit var beeperCallback: BeeperCallback
 
     override fun onCreate() {
         super.onCreate()
 
         JetBeepSDK.init(
             this,
-            "179c",
+            "0179c",
             "jetbeep-test",
             "35117dd1-a7bf-4167-b154-86626f3fac17",
             JetBeepRegistrationType.REGISTERED
@@ -68,14 +68,31 @@ class App : Application() {
 
         JetBeepSDK.repository.trySync()
 
+        beeperCallback = object : BeeperCallback() {
+            override fun onEvent(beeperEvent: BeeperEvent) {
+                if (!JetBeepSDK.isInBackgroundNow)
+                    return
+
+                showNotification(beeperEvent)
+            }
+        }
+
+        JetBeepSDK.beeper.subscribe(beeperCallback)
+
         locationCallbacks = object : LocationCallbacks {
-            override fun onObtainActualShops(shops: List<Shop>) {
+            override fun onMerchantEntered(merchant: Merchant) {
+                JetBeepSDK.notificationsManager.showNotification(
+                    "Enter event",
+                    "Welcome to ${merchant.name}",
+                    R.mipmap.ic_launcher,
+                    null,
+                    null
+                )
             }
 
-            override fun onShopExit(shop: Shop, merchant: Merchant) {
-            }
+            override fun onMerchantExit(merchant: Merchant) { }
 
-            override fun onShopEntered(shop: Shop, merchant: Merchant) {
+            override fun onShopEntered(shop: Shop) {
                 JetBeepSDK.notificationsManager.showNotification(
                     "Enter event",
                     "Welcome to ${shop.name}",
@@ -84,31 +101,71 @@ class App : Application() {
                     null
                 )
             }
+
+            override fun onShopExit(shop: Shop) { }
         }
 
         JetBeepSDK.locations.subscribe(locationCallbacks)
-        JetBeepSDK.beeper.subscribe(beeperCallback)
+
     }
 
     private fun showNotification(beeperEvent: BeeperEvent) {
         when (beeperEvent) {
             is LoyaltyTransferred -> {
-                JetBeepSDK.notificationsManager.showNotification(
-                    "Loyalty card transferred",
-                    "Loyalty card",
-                    R.mipmap.ic_launcher,
-                    null,
-                    null
-                )
+                JetBeepSDK.repository.merchants.getByIdFromCache(beeperEvent.shop.merchantId)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({ merchant ->
+                        if (merchant != null) {
+                            JetBeepSDK.notificationsManager.showNotification(
+                                "Loyalty card from $merchant transferred",
+                                "Loyalty card",
+                                R.mipmap.ic_launcher,
+                                null,
+                                null
+                            )
+                        }
+                    }, {
+                        Log.e("JB_customers", "is error :${it.message}")
+                    })
             }
             is NoLoyaltyCard -> {
-                JetBeepSDK.notificationsManager.showNotification(
-                    "Loyalty card not found",
-                    "Loyalty card",
-                    R.mipmap.ic_launcher,
-                    null,
-                    null
-                )
+                JetBeepSDK.repository.merchants.getByIdFromCache(beeperEvent.shop.merchantId)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({ merchant ->
+                        if (merchant != null) {
+                            JetBeepSDK.notificationsManager.showNotification(
+                                "Loyalty card for $merchant not found",
+                                "Loyalty card not found",
+                                R.mipmap.ic_launcher,
+                                null,
+                                null
+                            )
+                        }
+                    }, {
+                        Log.e("JB_customers", "is error :${it.message}")
+                    })
+            }
+            is PaymentInitiated -> {
+                JetBeepSDK.repository.merchants.getByIdFromCache(beeperEvent.paymentRequest.shop.merchantId)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({ merchant ->
+                        if (merchant != null) {
+                            JetBeepSDK.notificationsManager.showNotification(
+                                "Payment initiated for $merchant",
+                                "Payment initiated",
+                                R.mipmap.ic_launcher,
+                                null,
+                                null
+                            )
+                        } else
+                            Log.e("JB_customers", "is null")
+                    }, {
+                        Log.e("JB_customers", "is error :${it.message}")
+                        //TODO: implement error handling
+                    })
             }
         }
     }
