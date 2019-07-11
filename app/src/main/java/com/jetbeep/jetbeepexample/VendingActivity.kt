@@ -132,13 +132,6 @@ class VendingActivity : Activity() {
 
         vending.subscribe(callback)
         JetBeepSDK.beeper.subscribe(beeperCallback)
-
-        val restartBeeper = (JetBeepSDK.beeper.lastEvent is NotAdvertising && !JetBeepSDK.isBeeping)
-                || JetBeepSDK.beeper.lastEvent is SessionClosed
-        if (restartBeeper)
-            JetBeepSDK.startBeep()
-        else
-            beeperCallback.onEvent(JetBeepSDK.beeper.lastEvent)
     }
 
     override fun onPause() {
@@ -146,11 +139,6 @@ class VendingActivity : Activity() {
 
         vending.unsubscribe(callback)
         JetBeepSDK.beeper.unsubscribe(beeperCallback)
-
-        Handler().post {
-            if (JetBeepSDK.beeper.isStarted && !JetBeepSDK.beeper.isSessionOpened)
-                JetBeepSDK.stopBeep()
-        }
     }
 
     class DevicesAdapter(private var context: Context) : RecyclerView.Adapter<DeviceViewHolder>() {
