@@ -4,15 +4,12 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.os.Bundle
-import android.os.Handler
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.jetbeep.JetBeepSDK
-import com.jetbeep.beeper.events.*
-import com.jetbeep.beeper.events.helpers.BeeperCallback
 import com.jetbeep.locations.VendingDevices
 import kotlinx.android.synthetic.main.activity_main.console
 import kotlinx.android.synthetic.main.activity_vending_new.*
@@ -36,35 +33,9 @@ class VendingActivity : Activity() {
         }
     }
 
-    private val beeperCallback = object : BeeperCallback() {
-        override fun onEvent(beeperEvent: BeeperEvent) {
-            when (beeperEvent) {
-                is Advertising -> {
-                    printToConsole("Beeper -> is Advertising")
-                }
-                is SessionOpened -> {
-                    printToConsole("Beeper -> is SessionOpened")
-                }
-                is SessionClosed -> {
-                    printToConsole("Beeper -> is SessionClosed")
-                }
-
-                is PaymentInitiated -> {
-                    printToConsole("Beeper -> is PaymentInitiated")
-                }
-                is PaymentInProgress -> {
-                    printToConsole("Beeper -> is PaymentInProgress")
-                }
-                is PaymentError -> {
-                    printToConsole("Beeper -> is PaymentError")
-                }
-                is PaymentSuccessful -> {
-                    printToConsole("Beeper -> is PaymentSuccessful")
-                }
-                is BluetoothFeatureNotSupported -> {
-                    printToConsole("Beeper -> is BluetoothFeatureNotSupported")
-                }
-            }
+    private val eventCallback = object : VendingDevices.DeviceEventListener {
+        override fun onEventChanged(state: VendingDevices.DeviceState) {
+            printToConsole("EVENT -> ${state.name}")
         }
     }
 
@@ -130,15 +101,15 @@ class VendingActivity : Activity() {
     override fun onResume() {
         super.onResume()
 
+        vending.subscribeEvents(eventCallback)
         vending.subscribe(callback)
-        JetBeepSDK.beeper.subscribe(beeperCallback)
     }
 
     override fun onPause() {
         super.onPause()
 
         vending.unsubscribe(callback)
-        JetBeepSDK.beeper.unsubscribe(beeperCallback)
+        vending.unsubscribeEvents(eventCallback)
     }
 
     class DevicesAdapter(private var context: Context) : RecyclerView.Adapter<DeviceViewHolder>() {
