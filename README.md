@@ -42,7 +42,9 @@ Example of initialization of JetBeepSdK:
         registrationType // Jetbeep registration type
     )
 ```
-##Jetbeep registration types
+
+## Jetbeep registration types
+
 *REGISTERED* - gives ability to get personalized offers, notifications and access to loyalty cards. 
 Additionally need to send authToken for identifying the user.
 ```kotlin
