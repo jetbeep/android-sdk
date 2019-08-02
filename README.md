@@ -8,7 +8,7 @@ https://drive.google.com/drive/u/1/folders/1exPvE0fJYBYEf-XRj5r4i4IQqMalLuma
 Add this dependency to your project's build file:
 
 ```groovy
-implementation 'com.jetbeep:jetbeepsdk:0.8.18'
+implementation 'com.jetbeep:jetbeepsdk:0.9.4'
 ```
 
 To build debug version of app add snapshot repository to your build.gradle file:
@@ -25,8 +25,8 @@ allprojects {
 Then add release and debug dependencies to your project's build file:
 
 ```groovy
-    releaseImplementation 'com.jetbeep:jetbeepsdk:0.8.18'
-    debugImplementation 'com.jetbeep:jetbeepsdk:0.8.18-SNAPSHOT'
+    releaseImplementation 'com.jetbeep:jetbeepsdk:0.9.4'
+    debugImplementation 'com.jetbeep:jetbeepsdk:0.9.4-SNAPSHOT'
 ```
 
 ### Now you are ready to go!
@@ -42,6 +42,14 @@ Example of initialization of JetBeepSdK:
         registrationType // Jetbeep registration type
     )
 ```
+##Jetbeep registration types
+*REGISTERED* - gives ability to get personalized offers, notifications and access to loyalty cards. 
+Additionally need to send authToken for identifying the user.
+```kotlin
+    JetBeepSDK.authToken = "123a45b6-123a-4b56-789c-0e22345b6cd7" // example of authToken
+```
+*NONE* - you can access to common offers and notifications only, but no access to personalized items. 
+Also, you need to handle a callback for loyalty cards by yourself.
 
 Instance of barcode handler protocol, it will be used when you will provide barcodes
 
@@ -87,6 +95,38 @@ To receive events of entry and exit into the zone of beacon, install a listener:
     }
     
     JetBeepSDK.locations.subscribe(locationCallbacks)
+```
+
+To receive push notifications, subscribe to PushNotificationListener. Inside you can add a logic for different types of notifications.
+As show in example below, we show silent notifications for merchant types TRANSPORT and VENDING. 
+Full realisation of *SilentNotification* see in test application.
+
+```kotlin
+    JetBeepSDK.pushNotificationManager.subscribe(object : PushNotificationListener {
+                override fun onShowNotification(info: PushNotificationManager.NotificationInfo) {
+                    val merchant = info.merchant
+    
+                    if (MerchantType.TRANSPORT.name == merchant.type ||
+                        MerchantType.VENDING.name == merchant.type
+                    ) {
+                        silentNotificationHolder.showNotification(info)
+                    } else {
+                        val shop = info.shop
+                        //OfferNotification(applicationContext, shop.id).show(info)
+                        JetBeepSDK.notificationsManager.showNotification(
+                            "Enter event",
+                            "Welcome to ${shop.name}",
+                            R.mipmap.ic_launcher,
+                            null,
+                            null
+                        )
+                    }
+                }
+    
+                override fun onRemoveNotification(id: Int) {
+                    silentNotificationHolder.hideNotification(id)
+                }
+            })
 ```
 
 To receive events such as loyalty card transfers, install a listener:
