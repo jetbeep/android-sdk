@@ -59,17 +59,16 @@ Instance of barcode handler protocol, it will be used when you will provide barc
     JetBeepSDK.barcodeRequestHandler = object : JBBarcodeRequestProtocol {
         override var listener: JBBarcodeTransferProtocol? = object : JBBarcodeTransferProtocol {
             override fun failureBarcodeTransfer(shop: Shop) {
-                //
+                //TODO failureBarcodeTransfer
             }
 
             override fun succeedBarcodeTransfer(shop: Shop) {
-                //
+                //TODO succeedBarcodeTransfer
             }
-
         }
 
         override fun barcodeRequest(merchant: Merchant, shop: Shop): Array<Barcode>? {
-            //Put your barcodes based on merchant and shop
+            //TODO Put your barcodes based on merchant and shop
         }
     }
 ```
@@ -79,20 +78,24 @@ Handle result on your place to track is barcodes transfering moved succeed or no
     JBBarcodeRequestProtocol.listener
 ```
 
-To receive events of entry and exit into the zone of beacon, install a listener:
+To receive events of entry and exit into the zone of beacon, add a listener and subscribe to it:
 
 ```kotlin
     val locationCallbacks = object : LocationCallbacks {
-        override fun onObtainActualShops(shops: List<Shop>) {
-            //
+        override fun onMerchantEntered(merchant: Merchant) {
+        // TODO onMerchantEntered
         }
 
-        override fun onShopExit(shop: Shop, merchant: Merchant) {
-            //
+        override fun onMerchantExit(merchant: Merchant) {
+        // TODO onMerchantExit
         }
 
-        override fun onShopEntered(shop: Shop, merchant: Merchant) {
-            //
+        override fun onShopEntered(shop: Shop) {
+        // TODO onShopEntered
+        }
+
+        override fun onShopExit(shop: Shop) {
+        // TODO onShopExit
         }
     }
     
@@ -130,7 +133,7 @@ Full realization of *SilentNotification* see in the test application.
             })
 ```
 
-To receive events such as loyalty card transfers, install a listener:
+To receive events such as loyalty card transfers, add this listener and subscribe to it:
 
 ```kotlin
     val beeperCallback: BeeperCallback = object : BeeperCallback() {
@@ -232,18 +235,15 @@ IMPORTANT NOTE: Before testing ensure that your devices is configured for VENDIN
   
 `connect(device: ConnectableDevice): Boolean` - to connect to specified device. Returns *true* on successful connection.
 
-
 `disconnect(): Boolean` - to disconnect from device. Returns *true* on successful disconnection. 
-
 
 `subscribe(customerCallback: DeviceChangeListener)` - subscribe to a listener to get updates of devices and their statuses. 
 
-
 `unsubscribe(customerCallback: DeviceChangeListener)` - unsubscribe from a listener.
-
 
 `getVisibleDevices(): List<ConnectableDevice>` - get a list of all visible connectable devices.
 
 **`ConnectableDevice`** - entity of connectable device. Contains some public things:
- - `shopId` - shop id of the device
+ - `shopId: Int` - shop id of the device
+ - `shopName: String` - shop name
  - `isConnectable(): Boolean` - returns true if device is connectable at the moment.
