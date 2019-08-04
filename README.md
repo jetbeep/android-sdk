@@ -45,12 +45,12 @@ Example of initialization of JetBeepSdK:
 
 #### Jetbeep registration types
 
-**REGISTERED** - gives ability to get personalized offers, notifications and access to loyalty cards. 
+`JetBeepRegistrationType.REGISTERED` - gives ability to get personalized offers, notifications and access to loyalty cards. 
 Additionally need to send authToken for identifying the user.
 ```kotlin
     JetBeepSDK.authToken = "123a45b6-123a-4b56-789c-0e22345b6cd7" // example of authToken
 ```
-**NONE** - you can access to common offers and notifications only, but no access to personalized items. 
+`JetBeepRegistrationType.ANONYMOUS` - you can access to common offers and notifications only, but no access to personalized items. 
 Also, you need to handle a callback for loyalty cards by yourself.
 
 Instance of barcode handler protocol, it will be used when you will provide barcodes
