@@ -25,7 +25,7 @@ class App : Application() {
 
         JetBeepSDK.init(
             this,
-            "0179c",
+            "179c",
             "jetbeep-test",
             "35117dd1-a7bf-4167-b154-86626f3fac17",
             JetBeepRegistrationType.REGISTERED
