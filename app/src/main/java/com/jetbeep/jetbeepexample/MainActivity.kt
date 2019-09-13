@@ -2,6 +2,10 @@ package com.jetbeep.jetbeepexample
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothManager
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -30,6 +34,8 @@ class MainActivity : PermissionsActivity() {
 
     private var locationListener: LocationCallbacks? = null
 
+    private val REQUEST_ENABLE_ON_START_APP_BT = 123
+
     private val beeperCallback: BeeperCallback = object : BeeperCallback() {
         override fun onEvent(beeperEvent: BeeperEvent) {
             printToConsole(beeperEvent.javaClass.simpleName)
@@ -43,11 +49,15 @@ class MainActivity : PermissionsActivity() {
         console.movementMethod = ScrollingMovementMethod()
         printToConsole("Hello world")
 
+        loadVending.isEnabled = false
+
         loadMerchant.setOnClickListener { loadAllMerchants() }
         loadShop.setOnClickListener { loadAllShops() }
         loadOffers.setOnClickListener { loadAllOffers() }
-        startAdvertising.setOnClickListener { startAdvertising() }
-        loadVending.setOnClickListener { startVending() }
+
+        if (checkBluetooth()) {
+            enableVending()
+        }
 
         // This permissions needs to scanning beacons
         if (!checkPermissions()) {
@@ -63,6 +73,28 @@ class MainActivity : PermissionsActivity() {
                 }
             })
         }
+    }
+
+    private fun enableVending() {
+        loadVending.isEnabled = true
+        loadVending.setOnClickListener { startVending() }
+    }
+
+    private fun checkBluetooth(): Boolean {
+        val bm = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+        val bAdapter = bm.adapter
+
+        if (bAdapter != null) {
+            if (bAdapter.isEnabled) {
+                return true
+            }
+
+            val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+            startActivityForResult(enableBtIntent, REQUEST_ENABLE_ON_START_APP_BT)
+        } else {
+            printToConsole("Error! Bluetooth adapter not found!")
+        }
+        return false
     }
 
     private fun getLocationListener(): LocationCallbacks {
@@ -95,7 +127,7 @@ class MainActivity : PermissionsActivity() {
         JetBeepSDK.beeper.subscribe(beeperCallback)
         JetBeepSDK.locations.subscribe(getLocationListener())
 
-        startAdvertising()
+        //startAdvertising()
     }
 
     override fun onPause() {
@@ -178,11 +210,11 @@ class MainActivity : PermissionsActivity() {
         )
     }
 
-    private fun startAdvertising() {
+    /*private fun startAdvertising() {
         if (!JetBeepSDK.isBeeping) {
             JetBeepSDK.startBeep()
         }
-    }
+    }*/
 
     private fun startVending() {
         val intent = Intent(this, VendingActivity::class.java)
@@ -204,13 +236,28 @@ class MainActivity : PermissionsActivity() {
     private fun checkPermissions(): Boolean {
         val permissionStateCoarse = ActivityCompat.checkSelfPermission(
             this,
-            android.Manifest.permission.ACCESS_COARSE_LOCATION
+            Manifest.permission.ACCESS_COARSE_LOCATION
         )
         val permissionStateFine = ActivityCompat.checkSelfPermission(
             this,
-            android.Manifest.permission.ACCESS_FINE_LOCATION
+            Manifest.permission.ACCESS_FINE_LOCATION
         )
         return permissionStateCoarse == PackageManager.PERMISSION_GRANTED ||
                 permissionStateFine == PackageManager.PERMISSION_GRANTED
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == REQUEST_ENABLE_ON_START_APP_BT) {
+            when (resultCode) {
+                Activity.RESULT_OK -> {
+                    enableVending()
+                }
+                Activity.RESULT_CANCELED -> {
+                    Toast.makeText(this, "Please turn on Bluetooth!", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
     }
 }
