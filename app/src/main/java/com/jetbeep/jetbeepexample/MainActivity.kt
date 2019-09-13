@@ -49,7 +49,6 @@ class MainActivity : PermissionsActivity() {
         console.movementMethod = ScrollingMovementMethod()
         printToConsole("Hello world")
 
-        startAdvertising.isEnabled = false
         loadVending.isEnabled = false
 
         loadMerchant.setOnClickListener { loadAllMerchants() }
@@ -57,11 +56,8 @@ class MainActivity : PermissionsActivity() {
         loadOffers.setOnClickListener { loadAllOffers() }
 
         if(checkBluetooth()) {
-            enableAdvertisingAndVending()
+            enableVending()
         }
-
-        startAdvertising.setOnClickListener { startAdvertising() }
-        loadVending.setOnClickListener { startVending() }
 
         // This permissions needs to scanning beacons
         if (!checkPermissions()) {
@@ -79,10 +75,8 @@ class MainActivity : PermissionsActivity() {
         }
     }
 
-    private fun enableAdvertisingAndVending() {
-        startAdvertising.isEnabled = true
+    private fun enableVending() {
         loadVending.isEnabled = true
-        startAdvertising.setOnClickListener { startAdvertising() }
         loadVending.setOnClickListener { startVending() }
     }
 
@@ -216,11 +210,11 @@ class MainActivity : PermissionsActivity() {
         )
     }
 
-    private fun startAdvertising() {
+    /*private fun startAdvertising() {
         if (!JetBeepSDK.isBeeping) {
             JetBeepSDK.startBeep()
         }
-    }
+    }*/
 
     private fun startVending() {
         val intent = Intent(this, VendingActivity::class.java)
@@ -258,7 +252,7 @@ class MainActivity : PermissionsActivity() {
         if(requestCode == REQUEST_ENABLE_ON_START_APP_BT) {
             when (resultCode) {
                 Activity.RESULT_OK -> {
-                    enableAdvertisingAndVending()
+                    enableVending()
                 }
                 Activity.RESULT_CANCELED -> {
                     Toast.makeText(this, "Please turn on Bluetooth!", Toast.LENGTH_SHORT).show()
