@@ -29,8 +29,8 @@ android {
 }
 
 dependencies {
-    releaseImplementation 'com.jetbeep:jetbeepsdk:0.9.4'
-    debugImplementation 'com.jetbeep:jetbeepsdk:0.9.4-SNAPSHOT'
+    releaseImplementation 'com.jetbeep:jetbeepsdk:0.9.18'
+    debugImplementation 'com.jetbeep:jetbeepsdk:0.9.18-SNAPSHOT'
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
