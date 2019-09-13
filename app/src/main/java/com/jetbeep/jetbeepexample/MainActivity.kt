@@ -2,6 +2,10 @@ package com.jetbeep.jetbeepexample
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothManager
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -30,6 +34,8 @@ class MainActivity : PermissionsActivity() {
 
     private var locationListener: LocationCallbacks? = null
 
+    private val REQUEST_ENABLE_ON_START_APP_BT = 123
+
     private val beeperCallback: BeeperCallback = object : BeeperCallback() {
         override fun onEvent(beeperEvent: BeeperEvent) {
             printToConsole(beeperEvent.javaClass.simpleName)
@@ -43,9 +49,17 @@ class MainActivity : PermissionsActivity() {
         console.movementMethod = ScrollingMovementMethod()
         printToConsole("Hello world")
 
+        startAdvertising.isEnabled = false
+        loadVending.isEnabled = false
+
         loadMerchant.setOnClickListener { loadAllMerchants() }
         loadShop.setOnClickListener { loadAllShops() }
         loadOffers.setOnClickListener { loadAllOffers() }
+
+        if(checkBluetooth()) {
+            enableAdvertisingAndVending()
+        }
+
         startAdvertising.setOnClickListener { startAdvertising() }
         loadVending.setOnClickListener { startVending() }
 
@@ -63,6 +77,30 @@ class MainActivity : PermissionsActivity() {
                 }
             })
         }
+    }
+
+    private fun enableAdvertisingAndVending() {
+        startAdvertising.isEnabled = true
+        loadVending.isEnabled = true
+        startAdvertising.setOnClickListener { startAdvertising() }
+        loadVending.setOnClickListener { startVending() }
+    }
+
+    private fun checkBluetooth(): Boolean {
+        val bm = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+        val bAdapter = bm.adapter
+
+        if (bAdapter != null) {
+            if (bAdapter.isEnabled) {
+                return true
+            }
+
+            val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+            startActivityForResult(enableBtIntent, REQUEST_ENABLE_ON_START_APP_BT)
+        } else {
+            printToConsole("Error! Bluetooth adapter not found!")
+        }
+        return false
     }
 
     private fun getLocationListener(): LocationCallbacks {
@@ -95,7 +133,7 @@ class MainActivity : PermissionsActivity() {
         JetBeepSDK.beeper.subscribe(beeperCallback)
         JetBeepSDK.locations.subscribe(getLocationListener())
 
-        startAdvertising()
+        //startAdvertising()
     }
 
     override fun onPause() {
@@ -212,5 +250,20 @@ class MainActivity : PermissionsActivity() {
         )
         return permissionStateCoarse == PackageManager.PERMISSION_GRANTED ||
                 permissionStateFine == PackageManager.PERMISSION_GRANTED
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if(requestCode == REQUEST_ENABLE_ON_START_APP_BT) {
+            when (resultCode) {
+                Activity.RESULT_OK -> {
+                    enableAdvertisingAndVending()
+                }
+                Activity.RESULT_CANCELED -> {
+                    Toast.makeText(this, "Please turn on Bluetooth!", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
     }
 }
