@@ -36,18 +36,6 @@ class MainActivity : PermissionsActivity() {
         }
     }
 
-    /*private val locationCallbacks = object : LocationCallbacks {
-        override fun onObtainActualShops(shops: List<Shop>) {
-        }
-
-        override fun onShopExit(shop: Shop, merchant: Merchant) {
-        }
-
-        override fun onShopEntered(shop: Shop, merchant: Merchant) {
-            printToConsole("Entered shop: ${shop.name}")
-        }
-    }*/
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -121,63 +109,72 @@ class MainActivity : PermissionsActivity() {
     private fun loadAllMerchants() {
         printToConsole("Load merchants...")
 
-        compositeDisposable.add(JetBeepSDK.repository.merchants.getAll()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({ merchants ->
-                if (merchants.isNotEmpty()) {
-                    val str = StringBuilder("Merchants:")
-                    merchants.forEachIndexed { i, m -> str.append("\n").append("${i + 1})").append(m.name) }
-                    printToConsole(str.toString())
-                } else {
-                    printToConsole("Merchants is empty")
-                }
-            }, {
-                it.printStackTrace()
-                showToast("Failed to load merchants")
-            })
+        compositeDisposable.add(
+            JetBeepSDK.repository.merchants.getAll()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({ merchants ->
+                    if (merchants.isNotEmpty()) {
+                        val str = StringBuilder("Merchants:")
+                        merchants.forEachIndexed { i, m ->
+                            str.append("\n").append("${i + 1})").append(m.name)
+                        }
+                        printToConsole(str.toString())
+                    } else {
+                        printToConsole("Merchants is empty")
+                    }
+                }, {
+                    it.printStackTrace()
+                    showToast("Failed to load merchants")
+                })
         )
     }
 
     private fun loadAllShops() {
         printToConsole("Load shops...")
 
-        compositeDisposable.addAll(JetBeepSDK.repository.shops.getAll()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({ merchants ->
-                if (merchants.isNotEmpty()) {
-                    val str = StringBuilder("Shops:")
-                    merchants.forEachIndexed { i, s -> str.append("\n").append("${i + 1})").append(s.name) }
-                    printToConsole(str.toString())
-                } else {
-                    printToConsole("Shops is empty")
-                }
-            }, {
-                it.printStackTrace()
-                showToast("Failed to load shops")
-            })
+        compositeDisposable.addAll(
+            JetBeepSDK.repository.shops.getAll()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({ merchants ->
+                    if (merchants.isNotEmpty()) {
+                        val str = StringBuilder("Shops:")
+                        merchants.forEachIndexed { i, s ->
+                            str.append("\n").append("${i + 1})").append(s.name)
+                        }
+                        printToConsole(str.toString())
+                    } else {
+                        printToConsole("Shops is empty")
+                    }
+                }, {
+                    it.printStackTrace()
+                    showToast("Failed to load shops")
+                })
         )
     }
 
     private fun loadAllOffers() {
         printToConsole("Load offers...")
 
-        compositeDisposable.add(JetBeepSDK.repository.offers.getAll()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({ merchants ->
-                if (merchants.isNotEmpty()) {
-                    val str = StringBuilder("Offers:")
-                    merchants.forEachIndexed { i, o -> str.append("\n").append("${i + 1})").append(o.title) }
-                    printToConsole(str.toString())
-                } else {
-                    printToConsole("Offers is empty")
-                }
-            }, {
-                it.printStackTrace()
-                showToast("Failed to load offers")
-            })
+        compositeDisposable.add(
+            JetBeepSDK.repository.offers.getAll()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({ merchants ->
+                    if (merchants.isNotEmpty()) {
+                        val str = StringBuilder("Offers:")
+                        merchants.forEachIndexed { i, o ->
+                            str.append("\n").append("${i + 1})").append(o.title)
+                        }
+                        printToConsole(str.toString())
+                    } else {
+                        printToConsole("Offers is empty")
+                    }
+                }, {
+                    it.printStackTrace()
+                    showToast("Failed to load offers")
+                })
         )
     }
 
