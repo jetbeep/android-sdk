@@ -55,7 +55,7 @@ class MainActivity : PermissionsActivity() {
         loadShop.setOnClickListener { loadAllShops() }
         loadOffers.setOnClickListener { loadAllOffers() }
 
-        if(checkBluetooth()) {
+        if (checkBluetooth()) {
             enableVending()
         }
 
@@ -236,11 +236,11 @@ class MainActivity : PermissionsActivity() {
     private fun checkPermissions(): Boolean {
         val permissionStateCoarse = ActivityCompat.checkSelfPermission(
             this,
-            android.Manifest.permission.ACCESS_COARSE_LOCATION
+            Manifest.permission.ACCESS_COARSE_LOCATION
         )
         val permissionStateFine = ActivityCompat.checkSelfPermission(
             this,
-            android.Manifest.permission.ACCESS_FINE_LOCATION
+            Manifest.permission.ACCESS_FINE_LOCATION
         )
         return permissionStateCoarse == PackageManager.PERMISSION_GRANTED ||
                 permissionStateFine == PackageManager.PERMISSION_GRANTED
@@ -249,7 +249,7 @@ class MainActivity : PermissionsActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if(requestCode == REQUEST_ENABLE_ON_START_APP_BT) {
+        if (requestCode == REQUEST_ENABLE_ON_START_APP_BT) {
             when (resultCode) {
                 Activity.RESULT_OK -> {
                     enableVending()
