@@ -2,15 +2,11 @@ package com.jetbeep.jetbeepexample.notification
 
 import android.content.Context
 import android.support.v4.app.NotificationCompat
-import com.jetbeep.JetBeepSDK
 import com.jetbeep.locations.PushNotificationManager
 import com.jetbeep.model.MerchantType
 
 class SilentNotification(val context: Context, notificationId: Int) :
     BaseNotification(context, notificationId, NotificationChannels.SILENT_EVENT) {
-
-    private val TAG = "JB_TransportNotification"
-    private val L = JetBeepSDK.logger.getLogger(TAG)
 
     fun show(info: PushNotificationManager.NotificationInfo) {
         val merchant = info.merchant
@@ -34,7 +30,7 @@ class SilentNotification(val context: Context, notificationId: Int) :
             when (type) {
                 MerchantType.VENDING.name -> "Would you like a cup of coffee?"
                 MerchantType.TRANSPORT.name -> "Tap to buy a ticket"
-                else -> ""
+                else -> "Welcome to ${info.shop.name}"
             }
         }
 
@@ -45,7 +41,6 @@ class SilentNotification(val context: Context, notificationId: Int) :
             .setStyle(NotificationCompat.DecoratedCustomViewStyle())
             .build()
 
-        L.d("show notification, notify! " + merchant.name)
         notificationManager.notify(notificationId, notification)
     }
 }
