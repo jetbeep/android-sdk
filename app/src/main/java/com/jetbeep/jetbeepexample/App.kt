@@ -6,9 +6,14 @@ import android.os.Looper
 import android.util.Log
 import android.widget.Toast
 import com.jetbeep.*
+import com.jetbeep.analytics.Analytics
 import com.jetbeep.beeper.events.*
 import com.jetbeep.beeper.events.helpers.BeeperCallback
+import com.jetbeep.jetbeepexample.notification.SilentNotificationHolder
 import com.jetbeep.locations.LocationCallbacks
+import com.jetbeep.locations.PushNotificationListener
+import com.jetbeep.locations.PushNotificationManager
+import com.jetbeep.model.MerchantType
 import com.jetbeep.model.entities.Merchant
 import com.jetbeep.model.entities.Shop
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -16,9 +21,9 @@ import io.reactivex.schedulers.Schedulers
 
 class App : Application() {
 
-    private lateinit var locationCallbacks: LocationCallbacks
-
     private lateinit var beeperCallback: BeeperCallback
+
+    private val silentNotificationHolder by lazy { SilentNotificationHolder(applicationContext) }
 
     override fun onCreate() {
         super.onCreate()
@@ -75,35 +80,31 @@ class App : Application() {
         }
 
         JetBeepSDK.beeper.subscribe(beeperCallback)
+        JetBeepSDK.pushNotificationManager.subscribe(object : PushNotificationListener {
+            override fun onShowNotification(info: PushNotificationManager.NotificationInfo) {
+                val merchant = info.merchant
 
-        locationCallbacks = object : LocationCallbacks {
-            override fun onMerchantEntered(merchant: Merchant) {
-                JetBeepSDK.notificationsManager.showNotification(
-                    "Enter event",
-                    "Welcome to ${merchant.name}",
-                    R.mipmap.ic_launcher,
-                    null,
-                    null
-                )
+                if (MerchantType.TRANSPORT.name == merchant.type ||
+                    MerchantType.VENDING.name == merchant.type
+                ) {
+                    silentNotificationHolder.showNotification(info)
+                } else {
+                    val shop = info.shop
+                    //OfferNotification(applicationContext, shop.id).show(info)
+                    JetBeepSDK.notificationsManager.showNotification(
+                        "Enter event",
+                        "Welcome to ${shop.name}",
+                        R.mipmap.ic_launcher,
+                        null,
+                        null
+                    )
+                }
             }
 
-            override fun onMerchantExit(merchant: Merchant) { }
-
-            override fun onShopEntered(shop: Shop) {
-                JetBeepSDK.notificationsManager.showNotification(
-                    "Enter event",
-                    "Welcome to ${shop.name}",
-                    R.mipmap.ic_launcher,
-                    null,
-                    null
-                )
+            override fun onRemoveNotification(id: Int) {
+                silentNotificationHolder.hideNotification(id)
             }
-
-            override fun onShopExit(shop: Shop) { }
-        }
-
-        JetBeepSDK.locations.subscribe(locationCallbacks)
-
+        })
     }
 
     private fun showNotification(beeperEvent: BeeperEvent) {

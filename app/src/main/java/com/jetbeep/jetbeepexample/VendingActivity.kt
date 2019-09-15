@@ -38,33 +38,7 @@ class VendingActivity : Activity() {
 
     private val beeperCallback = object : BeeperCallback() {
         override fun onEvent(beeperEvent: BeeperEvent) {
-            when (beeperEvent) {
-                is Advertising -> {
-                    printToConsole("Beeper -> is Advertising")
-                }
-                is SessionOpened -> {
-                    printToConsole("Beeper -> is SessionOpened")
-                }
-                is SessionClosed -> {
-                    printToConsole("Beeper -> is SessionClosed")
-                }
-
-                is PaymentInitiated -> {
-                    printToConsole("Beeper -> is PaymentInitiated")
-                }
-                is PaymentInProgress -> {
-                    printToConsole("Beeper -> is PaymentInProgress")
-                }
-                is PaymentError -> {
-                    printToConsole("Beeper -> is PaymentError")
-                }
-                is PaymentSuccessful -> {
-                    printToConsole("Beeper -> is PaymentSuccessful")
-                }
-                is BluetoothFeatureNotSupported -> {
-                    printToConsole("Beeper -> is BluetoothFeatureNotSupported")
-                }
-            }
+            printToConsole("Beeper -> ${beeperEvent.javaClass.simpleName}")
         }
     }
 
@@ -102,6 +76,22 @@ class VendingActivity : Activity() {
         }
     }
 
+    private fun startBeeper() {
+        val restartBeeper = (JetBeepSDK.beeper.lastEvent is NotAdvertising && !JetBeepSDK.isBeeping)
+                || JetBeepSDK.beeper.lastEvent is SessionClosed
+        if (restartBeeper)
+            JetBeepSDK.startBeep()
+        else
+            beeperCallback.onEvent(JetBeepSDK.beeper.lastEvent)
+    }
+
+    private fun stopBeeper() {
+        Handler().post {
+            if (JetBeepSDK.beeper.isStarted && !JetBeepSDK.beeper.isSessionOpened)
+                JetBeepSDK.stopBeep()
+        }
+    }
+
     private fun update() {
 
         list = vending.getVisibleDevices()
@@ -119,7 +109,7 @@ class VendingActivity : Activity() {
 
                 if (item.isConnectable()) {
                     vending.connect(item)
-                    printToConsole("Connected! ShopId: ${item.shopId}")
+                    printToConsole("Connected! Shop name: ${item.shopName}")
                 } else {
                     printToConsole("Device isn't connectable")
                 }
@@ -132,6 +122,7 @@ class VendingActivity : Activity() {
 
         vending.subscribe(callback)
         JetBeepSDK.beeper.subscribe(beeperCallback)
+        startBeeper()
     }
 
     override fun onPause() {
@@ -139,6 +130,7 @@ class VendingActivity : Activity() {
 
         vending.unsubscribe(callback)
         JetBeepSDK.beeper.unsubscribe(beeperCallback)
+        stopBeeper()
     }
 
     class DevicesAdapter(private var context: Context) : RecyclerView.Adapter<DeviceViewHolder>() {
