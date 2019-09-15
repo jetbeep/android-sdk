@@ -8,7 +8,6 @@ enum class NotificationChannels(
     val channelName: String, val channelDescription: String,
     val importance: Int = NotificationManager.IMPORTANCE_HIGH
 ) {
-
     REGION_EVENT(
         R.raw.enter_region, "REGION_EVENT_CHANNEL",
         "Entry and exit events",

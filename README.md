@@ -8,7 +8,7 @@ https://drive.google.com/drive/u/1/folders/1exPvE0fJYBYEf-XRj5r4i4IQqMalLuma
 Add this dependency to your project's build file:
 
 ```groovy
-implementation 'com.jetbeep:jetbeepsdk:0.9.4'
+implementation 'com.jetbeep:jetbeepsdk:0.9.18'
 ```
 
 To build debug version of app add snapshot repository to your build.gradle file:
@@ -25,8 +25,8 @@ allprojects {
 Then add release and debug dependencies to your project's build file:
 
 ```groovy
-    releaseImplementation 'com.jetbeep:jetbeepsdk:0.9.4'
-    debugImplementation 'com.jetbeep:jetbeepsdk:0.9.4-SNAPSHOT'
+    releaseImplementation 'com.jetbeep:jetbeepsdk:0.9.18'
+    debugImplementation 'com.jetbeep:jetbeepsdk:0.9.18-SNAPSHOT'
 ```
 
 ### Now you are ready to go!

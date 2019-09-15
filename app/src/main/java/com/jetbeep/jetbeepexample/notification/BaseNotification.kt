@@ -21,8 +21,6 @@ open class BaseNotification(
 
     companion object {
         const val TAG = "JB_BaseNotification"
-
-        //val VIBRATE_PATTERN = longArrayOf(0, 100, 300, 400, 300, 50, 170, 50, 170, 50, 170, 400, 0)
     }
 
     private val cancelAction = "cancel_notification$notificationId"
