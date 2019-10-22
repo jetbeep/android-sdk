@@ -8,7 +8,7 @@ https://drive.google.com/drive/u/1/folders/1exPvE0fJYBYEf-XRj5r4i4IQqMalLuma
 Add this dependency to your project's build file:
 
 ```groovy
-implementation 'com.jetbeep:jetbeepsdk:0.9.18'
+implementation 'com.jetbeep:jetbeepsdk:1.2.0'
 ```
 
 To build debug version of app add snapshot repository to your build.gradle file:
@@ -25,8 +25,8 @@ allprojects {
 Then add release and debug dependencies to your project's build file:
 
 ```groovy
-    releaseImplementation 'com.jetbeep:jetbeepsdk:0.9.18'
-    debugImplementation 'com.jetbeep:jetbeepsdk:0.9.18-SNAPSHOT'
+    releaseImplementation 'com.jetbeep:jetbeepsdk:1.2.0'
+    debugImplementation 'com.jetbeep:jetbeepsdk:1.2.0-SNAPSHOT'
 ```
 
 ### Now you are ready to go!
@@ -39,7 +39,8 @@ Example of initialization of JetBeepSdK:
         serviceUUID, // serviceUUID
         appId, // your app name that you can request from our side,
         appToken, // your app token key that you can request from our side
-        registrationType // Jetbeep registration type
+        registrationType, // Jetbeep registration type
+        paymentProcessor // optional, implement PaymentProcessor interface if you want to pay on third-party servers
     )
 ```
 
@@ -143,6 +144,20 @@ To receive events such as loyalty card transfers, add this listener and subscrib
     }
     
     JetBeepSDK.beeper.subscribe(beeperCallback)
+```
+
+Implement the interface if you want to pay on third-party servers
+
+```kotlin
+interface PaymentProcessor {
+
+    fun pay(paymentRequest: PaymentRequest,
+            pinCode: String,
+            paymentInstrument: PaymentInstrument,
+            protocolVersion: Byte): Single<PaymentResult>
+
+    fun confirm(orderId: String, confirmation: String): Single<Any>
+}
 ```
 
 See the test application for more details.

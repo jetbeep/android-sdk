@@ -6,11 +6,9 @@ import android.os.Looper
 import android.util.Log
 import android.widget.Toast
 import com.jetbeep.*
-import com.jetbeep.analytics.Analytics
 import com.jetbeep.beeper.events.*
 import com.jetbeep.beeper.events.helpers.BeeperCallback
 import com.jetbeep.jetbeepexample.notification.SilentNotificationHolder
-import com.jetbeep.locations.LocationCallbacks
 import com.jetbeep.locations.PushNotificationListener
 import com.jetbeep.locations.PushNotificationManager
 import com.jetbeep.model.MerchantType
@@ -109,7 +107,9 @@ class App : Application() {
 
     private fun showNotification(beeperEvent: BeeperEvent) {
         when (beeperEvent) {
-            is SessionOpened -> { Log.d("JB_App", "SessionOpened")}
+            is SessionOpened -> {
+                Log.d("JB_App", "SessionOpened")
+            }
             is LoyaltyTransferred -> {
                 JetBeepSDK.repository.merchants.getByIdFromCache(beeperEvent.shop.merchantId)
                     .subscribeOn(Schedulers.io())

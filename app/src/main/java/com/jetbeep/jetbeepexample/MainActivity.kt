@@ -100,7 +100,7 @@ class MainActivity : PermissionsActivity() {
     private fun getLocationListener(): LocationCallbacks {
         if (locationListener == null) {
             locationListener = object : LocationCallbacks {
-                override fun onMerchantEntered(merchant: Merchant) {
+                override fun onMerchantEntered(merchant: Merchant, shop: Shop) {
                     printToConsole("Entered merchant: ${merchant.name}")
                 }
 
