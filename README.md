@@ -8,25 +8,7 @@ https://drive.google.com/drive/u/1/folders/1exPvE0fJYBYEf-XRj5r4i4IQqMalLuma
 Add this dependency to your project's build file:
 
 ```groovy
-implementation 'com.jetbeep:jetbeepsdk:1.2.0'
-```
-
-To build debug version of app add snapshot repository to your build.gradle file:
-
-```groovy
-allprojects {
-    repositories {
-        //...
-        maven {url "https://oss.sonatype.org/content/repositories/snapshots"}
-    }
-}
-```
-
-Then add release and debug dependencies to your project's build file:
-
-```groovy
-    releaseImplementation 'com.jetbeep:jetbeepsdk:1.2.0'
-    debugImplementation 'com.jetbeep:jetbeepsdk:1.2.0-SNAPSHOT'
+implementation 'com.jetbeep:jetbeepsdk:1.2.14'
 ```
 
 ### Now you are ready to go!
@@ -43,6 +25,12 @@ Example of initialization of JetBeepSdK:
         paymentProcessor // optional, implement PaymentProcessor interface if you want to pay on third-party servers
     )
 ```
+
+To use the debug version of sdk, you can call the method:
+```kotlin
+    JetBeepSDK.enableDebuggable()
+```
+**`Important`**. This call must be before the init method.
 
 #### Jetbeep registration types
 
