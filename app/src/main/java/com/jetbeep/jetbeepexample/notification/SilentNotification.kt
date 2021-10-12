@@ -1,7 +1,7 @@
 package com.jetbeep.jetbeepexample.notification
 
 import android.content.Context
-import android.support.v4.app.NotificationCompat
+import androidx.core.app.NotificationCompat
 import com.jetbeep.locations.PushNotificationManager
 import com.jetbeep.model.MerchantType
 
