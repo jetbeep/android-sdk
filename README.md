@@ -11,6 +11,11 @@ Add this dependency to your project's build file:
 implementation 'com.jetbeep:jetbeepsdk:1.2.14'
 ```
 
+## Permissions
+
+To scan JetBeep devices nearby an app must have ACCESS_FINE_LOCATION permission.
+Starting in Android 10 your app must have ACCESS_BACKGROUND_LOCATION permission in order to get result.
+
 ### Now you are ready to go!
 
 Example of initialization of JetBeepSdK:
@@ -156,7 +161,7 @@ You can get instance of VendingDevices here `JetBeepSDK.locations.vendingDevices
 It contains `ConnectableDevice`, entity for devices and `DeviceChangeListener`, that notifies any updates of devices. 
 
 ```kotlin
-    private val vending = JetBeepSDK.locations.vendingDevices
+    private val vending = JetBeepSDK.connections.vendingDevices
 ```
 
 ### Get a list of connectable devices
@@ -168,8 +173,8 @@ It contains `ConnectableDevice`, entity for devices and `DeviceChangeListener`, 
 ### Create callback & subscribe to DeviceChangeListener
 
 ```kotlin
-    private val callback = object : VendingDevices.DeviceChangeListener {
-            override fun onChangeDevices(devices: List<VendingDevices.ConnectableDevice>) {
+    private val callback = object : ConnectableDeviceStateChangeListener {
+            override fun onChangeDevices(devices: List<ConnectableDevice>) {
                 update(devices)
             }
         }
@@ -240,9 +245,9 @@ IMPORTANT NOTE: Before testing ensure that your devices is configured for VENDIN
 
 `disconnect(): Boolean` - to disconnect from device. Returns *true* on successful disconnection. 
 
-`subscribe(customerCallback: DeviceChangeListener)` - subscribe to a listener to get updates of devices and their statuses. 
+`subscribe(customerCallback: ConnectableDeviceStateChangeListener)` - subscribe to a listener to get updates of devices and their statuses. 
 
-`unsubscribe(customerCallback: DeviceChangeListener)` - unsubscribe from a listener.
+`unsubscribe(customerCallback: ConnectableDeviceStateChangeListener)` - unsubscribe from a listener.
 
 `getVisibleDevices(): List<ConnectableDevice>` - get a list of all visible connectable devices.
 
