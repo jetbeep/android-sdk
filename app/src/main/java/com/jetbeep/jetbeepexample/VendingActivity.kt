@@ -13,7 +13,9 @@ import com.jetbeep.JetBeepSDK
 import com.jetbeep.beeper.events.BeeperEvent
 import com.jetbeep.beeper.events.SessionClosed
 import com.jetbeep.beeper.events.helpers.BeeperCallback
-import com.jetbeep.locations.VendingDevices
+import com.jetbeep.connection.ConnectableDevice
+import com.jetbeep.connection.ConnectableDeviceStateChangeListener
+import com.jetbeep.connection.vending.VendingDevices
 import kotlinx.android.synthetic.main.activity_main.console
 import kotlinx.android.synthetic.main.activity_vending_new.*
 import kotlinx.android.synthetic.main.item_list_connectable_device.view.*
@@ -22,15 +24,15 @@ import java.util.*
 
 class VendingActivity : Activity() {
 
-    private val vending = JetBeepSDK.locations.vendingDevices
+    private val vending = JetBeepSDK.connections.vendingDevices
 
     private val format = SimpleDateFormat("HH:mm:ss: ", Locale.getDefault())
-    private var list = listOf<VendingDevices.ConnectableDevice>()
+    private var list = listOf<ConnectableDevice>()
 
     lateinit var adapter: DevicesAdapter
 
-    private val callback = object : VendingDevices.DeviceChangeListener {
-        override fun onChangeDevices(devices: List<VendingDevices.ConnectableDevice>) {
+    private val callback = object : ConnectableDeviceStateChangeListener {
+        override fun onChangeDevices(devices: List<ConnectableDevice>) {
             update()
             printToConsole("Devices changed. Found ${devices.size} devices")
         }
@@ -121,7 +123,7 @@ class VendingActivity : Activity() {
 
     class DevicesAdapter(private var context: Context) : RecyclerView.Adapter<DeviceViewHolder>() {
 
-        private var devices = listOf<VendingDevices.ConnectableDevice>()
+        private var devices = listOf<ConnectableDevice>()
         private var listener: DevicesClickListener? = null
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DeviceViewHolder {
@@ -148,7 +150,7 @@ class VendingActivity : Activity() {
         }
 
         fun update(
-            devices: List<VendingDevices.ConnectableDevice>,
+            devices: List<ConnectableDevice>,
             listener: DevicesClickListener
         ) {
 
