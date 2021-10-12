@@ -26,6 +26,9 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
 
+        if (BuildConfig.DEBUG) {
+            JetBeepSDK.enableDebuggable()
+        }
         JetBeepSDK.init(
             this,
             "179c",
