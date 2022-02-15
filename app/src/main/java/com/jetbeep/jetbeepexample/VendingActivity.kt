@@ -93,7 +93,7 @@ class VendingActivity : Activity() {
 
                 val item = list[position]
 
-                if (item.isConnectable()) {
+                if (item.isConnectable) {
                     vending.connect(item)
                     printToConsole("Connected! Shop name: ${item.shopName}")
                 } else {
