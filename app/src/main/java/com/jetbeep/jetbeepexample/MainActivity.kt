@@ -8,13 +8,16 @@ import android.bluetooth.BluetoothManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
-import androidx.core.app.ActivityCompat
 import android.text.method.ScrollingMovementMethod
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
 import com.jetbeep.JetBeepSDK
 import com.jetbeep.beeper.events.BeeperEvent
 import com.jetbeep.beeper.events.helpers.BeeperCallback
+import com.jetbeep.isBluetoothPermissionsGranted
+import com.jetbeep.isLocationPermissionsGranted
 import com.jetbeep.locations.LocationCallbacks
 import com.jetbeep.model.entities.Merchant
 import com.jetbeep.model.entities.Shop
@@ -61,10 +64,20 @@ class MainActivity : PermissionsActivity() {
 
         // This permissions needs to scanning beacons
         if (!checkPermissions()) {
-            requestPermissions(arrayOf(
-                Manifest.permission.ACCESS_COARSE_LOCATION,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ), object : PermissionCallBack {
+            val permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                arrayOf(
+                    Manifest.permission.BLUETOOTH_SCAN,
+                    Manifest.permission.BLUETOOTH_CONNECT,
+                    Manifest.permission.BLUETOOTH_ADVERTISE,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                )
+            } else {
+                arrayOf(
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                )
+            }
+            requestPermissions(permissions, object : PermissionCallBack {
                 override fun permissionGranted() {
                     if (!JetBeepSDK.backgroundActive) {
                         JetBeepSDK.enableBackground()
@@ -90,7 +103,13 @@ class MainActivity : PermissionsActivity() {
             }
 
             val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-            startActivityForResult(enableBtIntent, REQUEST_ENABLE_ON_START_APP_BT)
+            if (ActivityCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.BLUETOOTH_CONNECT
+                ) == PackageManager.PERMISSION_GRANTED
+            ) {
+                startActivityForResult(enableBtIntent, REQUEST_ENABLE_ON_START_APP_BT)
+            }
         } else {
             printToConsole("Error! Bluetooth adapter not found!")
         }
@@ -234,16 +253,11 @@ class MainActivity : PermissionsActivity() {
     }
 
     private fun checkPermissions(): Boolean {
-        val permissionStateCoarse = ActivityCompat.checkSelfPermission(
-            this,
-            Manifest.permission.ACCESS_COARSE_LOCATION
-        )
-        val permissionStateFine = ActivityCompat.checkSelfPermission(
-            this,
-            Manifest.permission.ACCESS_FINE_LOCATION
-        )
-        return permissionStateCoarse == PackageManager.PERMISSION_GRANTED ||
-                permissionStateFine == PackageManager.PERMISSION_GRANTED
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            isLocationPermissionsGranted(this) && isBluetoothPermissionsGranted(this)
+        } else {
+            isLocationPermissionsGranted(this)
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
