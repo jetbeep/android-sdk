@@ -29,18 +29,18 @@ your app before you can look for Bluetooth devices.
 
 If your app targets Android 11 (API level 30) or lower, declare the following permissions in your
 app's manifest file:
-```xml ACCESS_FINE_LOCATION``` is necessary because, on Android 11 and lower, a Bluetooth scan could
+```ACCESS_FINE_LOCATION``` is necessary because, on Android 11 and lower, a Bluetooth scan could
 potentially be used to gather information about the location of the user.
 
 If your app targets Android 9 (API level 28) or lower, you can declare
-the ```xml ACCESS_COARSE_LOCATION``` permission instead of the ```xml ACCESS_FINE_LOCATION```
+the ```ACCESS_COARSE_LOCATION``` permission instead of the ```ACCESS_FINE_LOCATION```
 permission.
 
 Because location permissions are runtime permissions, you must request these permissions at runtime
 along with declaring them in your manifest.
 
 In order for Android 10 and Android 11 to receive scan results in the background, you must also
-declare the ```xml ACCESS_BACKGROUND_LOCATION``` permission in your app's manifest file.
+declare the ```ACCESS_BACKGROUND_LOCATION``` permission in your app's manifest file.
 
 ### Now you are ready to go!
 
