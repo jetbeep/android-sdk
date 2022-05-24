@@ -8,17 +8,43 @@ https://drive.google.com/drive/u/1/folders/1exPvE0fJYBYEf-XRj5r4i4IQqMalLuma
 Add this dependency to your project's build file:
 
 ```groovy
-implementation 'com.jetbeep:jetbeepsdk:1.8.1'
+implementation 'com.jetbeep:jetbeepsdk:1.8.2'
 ```
 
 ## Permissions
 
-To scan JetBeep devices nearby an app must have ACCESS_FINE_LOCATION permission.
-Starting in Android 10 your app must have ACCESS_BACKGROUND_LOCATION permission in order to get result.
+#### Target Android 12 or higher
+
+If your app targets Android 12 (API level 31) or higher, declare the following permissions in your
+app's manifest file:
+
+```xml 
+    BLUETOOTH_SCAN, BLUETOOTH_ADVERTISE, BLUETOOTH_CONNECT
+```
+
+These permissions are runtime permissions. Therefore, you must explicitly request user approval in
+your app before you can look for Bluetooth devices.
+
+#### Target Android 11 or lower
+
+If your app targets Android 11 (API level 30) or lower, declare the following permissions in your
+app's manifest file:
+```xml ACCESS_FINE_LOCATION``` is necessary because, on Android 11 and lower, a Bluetooth scan could
+potentially be used to gather information about the location of the user.
+
+If your app targets Android 9 (API level 28) or lower, you can declare
+the ```xml ACCESS_COARSE_LOCATION``` permission instead of the ```xml ACCESS_FINE_LOCATION```
+permission.
+
+Because location permissions are runtime permissions, you must request these permissions at runtime
+along with declaring them in your manifest.
+
+In order for Android 10 and Android 11 to receive scan results in the background, you must also
+declare the ```xml ACCESS_BACKGROUND_LOCATION``` permission in your app's manifest file.
 
 ### Now you are ready to go!
 
-Example of initialization of JetBeepSdK:
+Example of initialization of JetBeepSdK (do this in the onCreate method in the Application class):
 
 ```kotlin
     JetBeepSDK.init(
@@ -28,6 +54,13 @@ Example of initialization of JetBeepSdK:
         appToken, // application access token, please request this value from Jetbeep
         registrationType, // Jetbeep registration type (for example JetBeepRegistrationType.ANONYMOUS)
     )
+```
+
+After receiving all permissions, you can start working with our devices:
+```kotlin
+    if (!JetBeepSDK.backgroundActive) {
+        JetBeepSDK.enableBackground()
+    }
 ```
 
 To use the debug version of sdk (our dev server), you can call the method:
