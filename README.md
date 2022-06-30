@@ -8,7 +8,7 @@ https://drive.google.com/drive/u/1/folders/1exPvE0fJYBYEf-XRj5r4i4IQqMalLuma
 Add this dependency to your project's build file:
 
 ```groovy
-implementation 'com.jetbeep:jetbeepsdk:1.8.2'
+implementation 'com.jetbeep:jetbeepsdk:1.9.0'
 ```
 
 ## Permissions
