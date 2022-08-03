@@ -8,7 +8,7 @@ https://drive.google.com/drive/u/1/folders/1exPvE0fJYBYEf-XRj5r4i4IQqMalLuma
 Add this dependency to your project's build file:
 
 ```groovy
-implementation 'com.jetbeep:jetbeepsdk:1.9.0'
+implementation 'com.jetbeep:jetbeepsdk:1.9.2'
 ```
 
 ## Permissions
@@ -53,6 +53,7 @@ Example of initialization of JetBeepSdK (do this in the onCreate method in the A
         appId, // application identifier, please request this value from Jetbeep
         appToken, // application access token, please request this value from Jetbeep
         registrationType, // Jetbeep registration type (for example JetBeepRegistrationType.ANONYMOUS)
+        isDebuggable, // To use the debug version of sdk (our dev server)
     )
 ```
 
@@ -62,12 +63,6 @@ After receiving all permissions, you can start working with our devices:
         JetBeepSDK.enableBackground()
     }
 ```
-
-To use the debug version of sdk (our dev server), you can call the method:
-```kotlin
-    JetBeepSDK.enableDebuggable()
-```
-**`Important`**. This call must be before the init method.
 
 // trySync() will cache information about devices in SDK
 // as the device configuration might change, you have to always run this code from here
