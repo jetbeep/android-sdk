@@ -1,63 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".MainActivity">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
 
     <Button
-            android:id="@+id/loadMerchant"
-            android:layout_width="155dp"
-            android:layout_height="46dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:text="@string/load_merchant"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+        android:id="@+id/checkPermission"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:text="@string/check_permissions"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-            android:id="@+id/loadShop"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:text="@string/load_shop"
-            app:layout_constraintStart_toEndOf="@+id/loadMerchant"
-            app:layout_constraintTop_toTopOf="@+id/loadMerchant" />
+        android:id="@+id/requestPermissions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:text="@string/request_permissions"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/checkPermission" />
 
     <Button
-            android:id="@+id/loadVending"
-            android:layout_width="0dp"
-            android:layout_height="47dp"
-            android:text="@string/load_vending"
-            app:layout_constraintEnd_toEndOf="@+id/loadShop"
-            app:layout_constraintStart_toStartOf="@+id/loadShop"
-            app:layout_constraintTop_toTopOf="@+id/loadOffers" />
+        android:id="@+id/loadMerchant"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:text="@string/load_merchant"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/requestPermissions" />
 
     <Button
-            android:id="@+id/loadOffers"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:text="@string/load_offers"
-            app:layout_constraintEnd_toEndOf="@+id/loadMerchant"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/loadMerchant" />
+        android:id="@+id/loadShop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="@string/load_shop"
+        app:layout_constraintStart_toEndOf="@id/loadMerchant"
+        app:layout_constraintTop_toTopOf="@id/loadMerchant" />
+
+    <Button
+        android:id="@+id/loadVending"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="@string/load_vending"
+        app:layout_constraintStart_toEndOf="@id/loadOffers"
+        app:layout_constraintTop_toTopOf="@id/loadOffers" />
+
+    <Button
+        android:id="@+id/loadOffers"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:text="@string/load_offers"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/loadMerchant" />
 
     <TextView
-            android:id="@+id/console"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_margin="16dp"
-            android:background="@color/background"
-            android:lineSpacingExtra="4dp"
-            android:padding="8dp"
-            android:textColor="@color/text"
-            android:textSize="16sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/loadOffers" />
+        android:id="@+id/console"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="8dp"
+        android:background="@color/background"
+        android:lineSpacingExtra="4dp"
+        android:padding="8dp"
+        android:textColor="@color/text"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/loadOffers" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -8,39 +8,71 @@ https://drive.google.com/drive/u/1/folders/1exPvE0fJYBYEf-XRj5r4i4IQqMalLuma
 Add this dependency to your project's build file:
 
 ```groovy
-implementation 'com.jetbeep:jetbeepsdk:1.9.2'
+implementation 'com.jetbeep:jetbeepsdk:1.11.3'
 ```
 
 ## Permissions
 
 #### Target Android 12 or higher
 
-If your app targets Android 12 (API level 31) or higher, declare the following permissions in your
-app's manifest file:
+If your app targets Android 12 (API level 31) or higher, you must explicitly request user approval
+in your app before you can use our sdk:
 
 ```xml 
-    BLUETOOTH_SCAN, BLUETOOTH_ADVERTISE, BLUETOOTH_CONNECT
+    android.permission.BLUETOOTH_SCAN
+    android.permission.BLUETOOTH_CONNECT
+    android.permission.BLUETOOTH_ADVERTISE
 ```
 
-These permissions are runtime permissions. Therefore, you must explicitly request user approval in
-your app before you can look for Bluetooth devices.
+These permissions are runtime permissions.
 
 #### Target Android 11 or lower
 
 If your app targets Android 11 (API level 30) or lower, declare the following permissions in your
 app's manifest file:
-```ACCESS_FINE_LOCATION``` is necessary because, on Android 11 and lower, a Bluetooth scan could
-potentially be used to gather information about the location of the user.
+```android.permission.ACCESS_FINE_LOCATION``` is necessary because, on Android 11 and lower, a
+Bluetooth scan could potentially be used to gather information about the location of the user.
+
+In order for Android 11 and Android 10 to receive scan results in the background, you must also
+declare the ```android.permission.ACCESS_BACKGROUND_LOCATION``` permission in your app's manifest
+file.
+
+On Android 11 (API level 30) and higher, however, the system dialog doesn't include
+the ```Allow all the time``` option. Instead, users must enable background location on a settings
+page. You can help users navigate to this settings page by following best practices when requesting
+the background location permission. First ask the user
+for ```Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION```
+permissions. After the user grants these permissions, request
+the ```Manifest.permission.ACCESS_BACKGROUND_LOCATION``` permission.
+
+See the official Android documentation for more details.
+[Request background location](https://developer.android.com/training/location/permissions#request-background-location)
+
+#### Target Android 9 or lower
 
 If your app targets Android 9 (API level 28) or lower, you can declare
-the ```ACCESS_COARSE_LOCATION``` permission instead of the ```ACCESS_FINE_LOCATION```
-permission.
+the ```android.permission.ACCESS_COARSE_LOCATION``` permission instead of
+the ```android.permission.ACCESS_FINE_LOCATION``` permission.
 
 Because location permissions are runtime permissions, you must request these permissions at runtime
 along with declaring them in your manifest.
 
-In order for Android 10 and Android 11 to receive scan results in the background, you must also
-declare the ```ACCESS_BACKGROUND_LOCATION``` permission in your app's manifest file.
+The following code snippet shows how to declare location permissions:
+
+```xml
+    <manifest>
+        <uses-permission
+        android:name="android.permission.ACCESS_COARSE_LOCATION"
+        android:maxSdkVersion="30" />
+        <uses-permission
+        android:name="android.permission.ACCESS_FINE_LOCATION"
+        android:maxSdkVersion="30" />
+        <uses-permission
+        android:name="android.permission.ACCESS_BACKGROUND_LOCATION"
+        tools:targetApi="R"
+        android:maxSdkVersion="30" />
+    </manifest>
+```
 
 ### Now you are ready to go!
 
@@ -345,7 +377,7 @@ or `Activity`:
 
 ```kotlin
     JetBeepSDK.connections.lockers.stopSearch()
-JetBeepSDK.connections.lockers.unsubscribe()
+    JetBeepSDK.connections.lockers.unsubscribe()
 ```
 
 ### Testing

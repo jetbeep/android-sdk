@@ -7,4 +7,7 @@
     <string name="update">update</string>
     <string name="disconnect">disconnect</string>
     <string name="connect">connect</string>
+    <string name="check_permissions">Check permissions</string>
+    <string name="request_permissions">Request permissions</string>
+    <string name="permissions">Permissions</string>
 </resources>
