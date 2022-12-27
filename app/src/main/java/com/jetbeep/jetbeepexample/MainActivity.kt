@@ -19,6 +19,8 @@ import com.jetbeep.beeper.events.helpers.BeeperCallback
 import com.jetbeep.isBluetoothPermissionsGranted
 import com.jetbeep.isLocationPermissionsGranted
 import com.jetbeep.locations.LocationCallbacks
+import com.jetbeep.logger.LogCallback
+import com.jetbeep.logger.LogLine
 import com.jetbeep.model.entities.Merchant
 import com.jetbeep.model.entities.Shop
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -45,6 +47,12 @@ class MainActivity : PermissionsActivity() {
         }
     }
 
+    private val loggerCallback = object : LogCallback() {
+        override fun onLogLine(logLine: LogLine) {
+            printToConsole(logLine.message)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -57,35 +65,61 @@ class MainActivity : PermissionsActivity() {
         loadMerchant.setOnClickListener { loadAllMerchants() }
         loadShop.setOnClickListener { loadAllShops() }
         loadOffers.setOnClickListener { loadAllOffers() }
+        checkPermission.setOnClickListener {
+            printToConsole("Permissions granted: ${checkPermissions()}")
+        }
+        requestPermissions.setOnClickListener { requestPermissions() }
 
         if (checkBluetooth()) {
             enableVending()
         }
+    }
 
+    private fun requestPermissions() {
         // This permissions needs to scanning beacons
-        if (!checkPermissions()) {
-            val permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        val permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            arrayOf(
+                Manifest.permission.BLUETOOTH_SCAN,
+                Manifest.permission.BLUETOOTH_CONNECT,
+                Manifest.permission.BLUETOOTH_ADVERTISE,
+            )
+        } else {
+            if (isLocationPermissionsGranted(this) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 arrayOf(
-                    Manifest.permission.BLUETOOTH_SCAN,
-                    Manifest.permission.BLUETOOTH_CONNECT,
-                    Manifest.permission.BLUETOOTH_ADVERTISE,
-                    Manifest.permission.ACCESS_FINE_LOCATION
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_BACKGROUND_LOCATION
                 )
             } else {
                 arrayOf(
                     Manifest.permission.ACCESS_COARSE_LOCATION,
-                    Manifest.permission.ACCESS_FINE_LOCATION
+                    Manifest.permission.ACCESS_FINE_LOCATION,
                 )
             }
-            requestPermissions(permissions, object : PermissionCallBack {
-                override fun permissionGranted() {
-                    if (!JetBeepSDK.backgroundActive) {
-                        JetBeepSDK.enableBackground()
-                        printToConsole("Scan of beacons was started...")
-                    }
-                }
-            })
         }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val b = ActivityCompat.shouldShowRequestPermissionRationale(
+                this,
+                Manifest.permission.ACCESS_BACKGROUND_LOCATION
+            )
+            printToConsole("Request permissions, shouldShowRequestPermissionRationale = $b")
+        } else {
+            printToConsole("Request permissions")
+        }
+
+        requestPermissions(permissions, object : PermissionCallBack {
+            override fun permissionGranted() {
+                printToConsole("Permissions granted")
+                if (!JetBeepSDK.backgroundActive) {
+                    JetBeepSDK.enableBackground()
+                    printToConsole("Scan of beacons was started...")
+                }
+            }
+
+            override fun permissionDenied() {
+                printToConsole("Permissions denied")
+            }
+        })
     }
 
     private fun enableVending() {
@@ -143,6 +177,7 @@ class MainActivity : PermissionsActivity() {
     override fun onResume() {
         super.onResume()
 
+        JetBeepSDK.logger.subscribe(loggerCallback)
         JetBeepSDK.beeper.subscribe(beeperCallback)
         JetBeepSDK.locations.subscribe(getLocationListener())
 
@@ -153,6 +188,7 @@ class MainActivity : PermissionsActivity() {
         super.onPause()
         compositeDisposable.clear()
 
+        JetBeepSDK.logger.unsubscribe(loggerCallback)
         JetBeepSDK.beeper.unsubscribe(beeperCallback)
         JetBeepSDK.locations.unsubscribe(getLocationListener())
     }
@@ -254,7 +290,7 @@ class MainActivity : PermissionsActivity() {
 
     private fun checkPermissions(): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            isLocationPermissionsGranted(this) && isBluetoothPermissionsGranted(this)
+            isBluetoothPermissionsGranted(this)
         } else {
             isLocationPermissionsGranted(this)
         }
