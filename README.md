@@ -41,9 +41,9 @@ On Android 11 (API level 30) and higher, however, the system dialog doesn't incl
 the ```Allow all the time``` option. Instead, users must enable background location on a settings
 page. You can help users navigate to this settings page by following best practices when requesting
 the background location permission. First ask the user
-for ```Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION```
+for ```android.permission.ACCESS_FINE_LOCATION, android.permission.ACCESS_COARSE_LOCATION```
 permissions. After the user grants these permissions, request
-the ```Manifest.permission.ACCESS_BACKGROUND_LOCATION``` permission.
+the ```android.permission.ACCESS_BACKGROUND_LOCATION``` permission.
 
 See the official Android documentation for more details.
 [Request background location](https://developer.android.com/training/location/permissions#request-background-location)
