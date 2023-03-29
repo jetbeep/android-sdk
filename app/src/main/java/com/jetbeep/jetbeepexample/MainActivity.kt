@@ -65,6 +65,7 @@ class MainActivity : PermissionsActivity() {
         loadMerchant.setOnClickListener { loadAllMerchants() }
         loadShop.setOnClickListener { loadAllShops() }
         loadOffers.setOnClickListener { loadAllOffers() }
+        loadNotifications.setOnClickListener { loadAllNotifications() }
         checkPermission.setOnClickListener {
             printToConsole("Permissions granted: ${checkPermissions()}")
         }
@@ -224,10 +225,10 @@ class MainActivity : PermissionsActivity() {
             JetBeepSDK.repository.shops.getAll()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ merchants ->
-                    if (merchants.isNotEmpty()) {
+                .subscribe({ shops ->
+                    if (shops.isNotEmpty()) {
                         val str = StringBuilder("Shops:")
-                        merchants.forEachIndexed { i, s ->
+                        shops.forEachIndexed { i, s ->
                             str.append("\n").append("${i + 1})").append(s.name)
                         }
                         printToConsole(str.toString())
@@ -248,10 +249,10 @@ class MainActivity : PermissionsActivity() {
             JetBeepSDK.repository.offers.getAll()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ merchants ->
-                    if (merchants.isNotEmpty()) {
+                .subscribe({ offers ->
+                    if (offers.isNotEmpty()) {
                         val str = StringBuilder("Offers:")
-                        merchants.forEachIndexed { i, o ->
+                        offers.forEachIndexed { i, o ->
                             str.append("\n").append("${i + 1})").append(o.title)
                         }
                         printToConsole(str.toString())
@@ -261,6 +262,28 @@ class MainActivity : PermissionsActivity() {
                 }, {
                     it.printStackTrace()
                     showToast("Failed to load offers")
+                })
+        )
+    }
+
+    private fun loadAllNotifications() {
+        compositeDisposable.add(
+            JetBeepSDK.repository.notifications.getAll()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({ notifications ->
+                    if (notifications.isNotEmpty()) {
+                        val str = StringBuilder("Notifications:")
+                        notifications.forEachIndexed { i, o ->
+                            str.append("\n").append("${i + 1})").append(o.title)
+                        }
+                        printToConsole(str.toString())
+                    } else {
+                        printToConsole("Notifications is empty")
+                    }
+                }, {
+                    it.printStackTrace()
+                    showToast("Failed to load notifications")
                 })
         )
     }

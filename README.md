@@ -8,7 +8,7 @@ https://drive.google.com/drive/u/1/folders/1exPvE0fJYBYEf-XRj5r4i4IQqMalLuma
 Add this dependency to your project's build file:
 
 ```groovy
-implementation 'com.jetbeep:jetbeepsdk:1.11.3'
+implementation 'com.jetbeep:jetbeepsdk:1.11.8'
 ```
 
 ## Permissions
@@ -219,6 +219,41 @@ interface PaymentProcessor {
 ```
 
 See the test application for more details.
+
+## Personalized Offers and Notifications
+
+The Jetbeep SDK now supports personalized offers and notifications based on users' phone numbers or loyalty card numbers.
+
+### Assigning User Numbers
+
+To enable personalized offers and notifications, assign an array of strings containing phone numbers or loyalty card numbers to the `JetBeepSDK.repository.userNumbers` property:
+
+```kotlin
+    JetBeepSDK.repository.userNumbers = listOf("380007890000", ..)
+```
+
+### Usage
+
+Once you have assigned user numbers to `JetBeepSDK.repository.userNumbers`, the SDK will automatically start providing personalized offers and notifications to the specified users at the next fetching request of `trySync()` function.
+
+Please ensure that your application has obtained the necessary permissions from users to use their phone numbers or loyalty card numbers for this purpose.
+
+### Example
+
+Here's an example of how to set up personalized offers and notifications in your application:
+
+```kotlin
+    // Obtain user's phone number or loyalty card number
+    val userPhoneNumber = "380007890000"
+
+    // Assign the number to Jetbeep.shared.userNumbers
+    JetBeepSDK.repository.userNumbers = listOf(userPhoneNumber)
+
+    // Update offers and notifications
+    JetBeepSDK.repository.trySync()
+```
+
+The SDK will now provide personalized offers and notifications for the specified user
 
 ## Work with Vending
 

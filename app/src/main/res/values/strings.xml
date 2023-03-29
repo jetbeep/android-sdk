@@ -10,4 +10,5 @@
     <string name="check_permissions">Check permissions</string>
     <string name="request_permissions">Request permissions</string>
     <string name="permissions">Permissions</string>
+    <string name="load_notifications">Load notif</string>
 </resources>
