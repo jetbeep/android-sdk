@@ -48,7 +48,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:text="@string/load_vending"
-        app:layout_constraintStart_toEndOf="@id/loadOffers"
+        app:layout_constraintStart_toEndOf="@id/loadNotifications"
         app:layout_constraintTop_toTopOf="@id/loadOffers" />
 
     <Button
@@ -58,6 +58,15 @@
         android:layout_margin="8dp"
         android:text="@string/load_offers"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/loadMerchant" />
+
+    <Button
+        android:id="@+id/loadNotifications"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:text="@string/load_notifications"
+        app:layout_constraintStart_toEndOf="@id/loadOffers"
         app:layout_constraintTop_toBottomOf="@id/loadMerchant" />
 
     <TextView
