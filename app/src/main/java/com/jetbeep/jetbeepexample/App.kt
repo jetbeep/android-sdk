@@ -26,15 +26,13 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        if (BuildConfig.DEBUG) {
-            JetBeepSDK.enableDebuggable()
-        }
         JetBeepSDK.init(
             this,
             "179c",
             "jetbeep-test",
             "35117dd1-a7bf-4167-b154-86626f3fac17",
-            JetBeepRegistrationType.REGISTERED
+            JetBeepRegistrationType.REGISTERED,
+            isDebuggable = BuildConfig.DEBUG
         )
 
         JetBeepSDK.barcodeRequestHandler = object : JBBarcodeRequestProtocol {
