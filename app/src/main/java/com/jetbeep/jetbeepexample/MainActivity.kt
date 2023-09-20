@@ -16,8 +16,6 @@ import androidx.core.app.ActivityCompat
 import com.jetbeep.JetBeepSDK
 import com.jetbeep.beeper.events.BeeperEvent
 import com.jetbeep.beeper.events.helpers.BeeperCallback
-import com.jetbeep.isBluetoothPermissionsGranted
-import com.jetbeep.isLocationPermissionsGranted
 import com.jetbeep.locations.LocationCallbacks
 import com.jetbeep.logger.LogCallback
 import com.jetbeep.logger.LogLine
@@ -66,9 +64,7 @@ class MainActivity : PermissionsActivity() {
         loadShop.setOnClickListener { loadAllShops() }
         loadOffers.setOnClickListener { loadAllOffers() }
         loadNotifications.setOnClickListener { loadAllNotifications() }
-        checkPermission.setOnClickListener {
-            printToConsole("Permissions granted: ${checkPermissions()}")
-        }
+        checkPermission.setOnClickListener { checkPermissions() }
         requestPermissions.setOnClickListener { requestPermissions() }
 
         if (checkBluetooth()) {
@@ -78,26 +74,27 @@ class MainActivity : PermissionsActivity() {
 
     private fun requestPermissions() {
         // This permissions needs to scanning beacons
-        val permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            arrayOf(
-                Manifest.permission.BLUETOOTH_SCAN,
-                Manifest.permission.BLUETOOTH_CONNECT,
-                Manifest.permission.BLUETOOTH_ADVERTISE,
+
+        val permissions = mutableListOf<String>()
+        val currentAndroidVersion = Build.VERSION.SDK_INT
+
+        if (currentAndroidVersion <= Build.VERSION_CODES.P) {
+            printToConsole("Permissions: ACCESS_COARSE_LOCATION required.")
+            permissions.add(Manifest.permission.ACCESS_COARSE_LOCATION)
+        } else if (currentAndroidVersion in Build.VERSION_CODES.Q..Build.VERSION_CODES.R) {
+            printToConsole("Permissions: ACCESS_FINE_LOCATION required.")
+            permissions.add(Manifest.permission.ACCESS_FINE_LOCATION)
+        } else if (currentAndroidVersion >= Build.VERSION_CODES.S) {
+            printToConsole("Permissions: BLUETOOTH_SCAN required.")
+            permissions.addAll(
+                listOf(
+                    Manifest.permission.BLUETOOTH_SCAN,
+                    Manifest.permission.BLUETOOTH_CONNECT,
+                    Manifest.permission.BLUETOOTH_ADVERTISE
+                )
             )
-        } else {
-            if (isLocationPermissionsGranted(this) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                arrayOf(
-                    Manifest.permission.ACCESS_COARSE_LOCATION,
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_BACKGROUND_LOCATION
-                )
-            } else {
-                arrayOf(
-                    Manifest.permission.ACCESS_COARSE_LOCATION,
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                )
-            }
         }
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             val b = ActivityCompat.shouldShowRequestPermissionRationale(
                 this,
@@ -108,7 +105,7 @@ class MainActivity : PermissionsActivity() {
             printToConsole("Request permissions")
         }
 
-        requestPermissions(permissions, object : PermissionCallBack {
+        requestPermissions(permissions.toTypedArray(), object : PermissionCallBack {
             override fun permissionGranted() {
                 printToConsole("Permissions granted")
                 if (!JetBeepSDK.backgroundActive) {
@@ -182,6 +179,10 @@ class MainActivity : PermissionsActivity() {
         JetBeepSDK.beeper.subscribe(beeperCallback)
         JetBeepSDK.locations.subscribe(getLocationListener())
 
+        if (!JetBeepSDK.bleScanner.isForegroundScannerStarted()) {
+            JetBeepSDK.bleScanner.startForegroundScanner()
+        }
+
         //startAdvertising()
     }
 
@@ -192,6 +193,10 @@ class MainActivity : PermissionsActivity() {
         JetBeepSDK.logger.unsubscribe(loggerCallback)
         JetBeepSDK.beeper.unsubscribe(beeperCallback)
         JetBeepSDK.locations.unsubscribe(getLocationListener())
+
+        if (JetBeepSDK.bleScanner.isForegroundScannerStarted()) {
+            JetBeepSDK.bleScanner.stopForegroundScanner()
+        }
     }
 
     private fun loadAllMerchants() {
@@ -312,10 +317,48 @@ class MainActivity : PermissionsActivity() {
     }
 
     private fun checkPermissions(): Boolean {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            isBluetoothPermissionsGranted(this)
+        val currentAndroidVersion = Build.VERSION.SDK_INT
+
+        if (currentAndroidVersion <= Build.VERSION_CODES.P) {
+            val coarse = ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            )
+            val fine = ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            )
+            val result =
+                coarse == PackageManager.PERMISSION_GRANTED || fine == PackageManager.PERMISSION_GRANTED
+            printToConsole("ACCESS_COARSE_LOCATION granted = $result")
+            return result
+        } else if (currentAndroidVersion in Build.VERSION_CODES.Q..Build.VERSION_CODES.R) {
+            val fine = ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            )
+            val result = fine == PackageManager.PERMISSION_GRANTED
+            printToConsole("ACCESS_FINE_LOCATION granted = $result")
+            return result
+        } else if (currentAndroidVersion >= Build.VERSION_CODES.S) {
+            val permissionBtScan = ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.BLUETOOTH_SCAN
+            )
+            val permissionBtAdvertise = ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.BLUETOOTH_ADVERTISE
+            )
+            val permissionBtConnect = ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.BLUETOOTH_CONNECT
+            )
+            val result =
+                permissionBtScan == PackageManager.PERMISSION_GRANTED && permissionBtAdvertise == PackageManager.PERMISSION_GRANTED && permissionBtConnect == PackageManager.PERMISSION_GRANTED
+            printToConsole("BLUETOOTH_SCAN granted = $result")
+            return result
         } else {
-            isLocationPermissionsGranted(this)
+            throw IllegalStateException()
         }
     }
 
@@ -327,6 +370,7 @@ class MainActivity : PermissionsActivity() {
                 Activity.RESULT_OK -> {
                     enableVending()
                 }
+
                 Activity.RESULT_CANCELED -> {
                     Toast.makeText(this, "Please turn on Bluetooth!", Toast.LENGTH_SHORT).show()
                 }
